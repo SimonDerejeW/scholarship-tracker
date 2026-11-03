@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ExternalLink, Pencil } from "lucide-react";
+import { ExternalLink, Pencil, Plus } from "lucide-react";
 import { BoardColumns, BoardRows, boardRow, PageTitle, SectionHeading } from "@/components/board";
 import { Button } from "@/components/ui/button";
 import type { CatalogEntry } from "@/core";
@@ -66,7 +66,7 @@ export function EntryDetail({
       )}
       {data.notes && <p className="mt-4 max-w-prose whitespace-pre-wrap">{data.notes}</p>}
 
-      <Section title="Deadlines" editHref={`${base}/deadlines`}>
+      <Section title="Deadlines" editHref={`${base}/deadlines`} empty={!data.deadlines.length}>
         {data.deadlines.length === 0 ? (
           <Empty>No Deadlines yet. Add them once they&apos;re announced.</Empty>
         ) : (
@@ -87,9 +87,13 @@ export function EntryDetail({
         )}
       </Section>
 
-      <Section title="Requirements" editHref={`${base}/requirements`}>
+      <Section
+        title="Requirements"
+        editHref={`${base}/requirements`}
+        empty={!data.requirements.length}
+      >
         {data.requirements.length === 0 ? (
-          <Empty>No Requirements yet.</Empty>
+          <Empty>No Requirements yet. Pick common ones like CV or IELTS, or add your own.</Empty>
         ) : (
           <>
             <BoardColumns className={requirementColumns}>
@@ -123,10 +127,13 @@ const requirementColumns = "sm:grid sm:grid-cols-2 sm:gap-6";
 function Section({
   title,
   editHref,
+  empty,
   children,
 }: {
   title: string;
   editHref: string;
+  /** With nothing listed yet, the action reads Add rather than Edit. */
+  empty: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -135,7 +142,8 @@ function Section({
         action={
           <Button asChild variant="outline" size="sm">
             <Link href={editHref}>
-              Edit <span className="sr-only">{title}</span>
+              {empty && <Plus aria-hidden />}
+              {empty ? "Add" : "Edit"} <span className="sr-only">{title}</span>
             </Link>
           </Button>
         }
