@@ -2,11 +2,11 @@
 
 ## UI
 
-All UI follows `DESIGN.md`: The Departures Board, dark only. Until #13 writes `DESIGN.md`, follow the brief on issue #13. Product context is in `PRODUCT.md`.
+All UI follows `DESIGN.md`: The Departures Board, dark only. Product context is in `PRODUCT.md`.
 
 - Components come from shadcn (MCP in `.mcp.json`), restyled to the design tokens. Never ship the stock shadcn look or hard-coded colours.
 - UI copy uses `GLOSSARY.md` terms; the board metaphor is visual only.
-- For substantial UI work, use the `/impeccable` skill.
+- During ticket builds (`/implement`, `/implement-spec`), follow `DESIGN.md` directly and extend existing patterns. Don't invoke the `impeccable` skill: its design rounds wait for the user to choose, which stalls unattended builds. The user runs impeccable separately at review points.
 
 ## Agent skills
 
