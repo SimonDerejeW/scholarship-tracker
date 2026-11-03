@@ -3,5 +3,27 @@
 .env*.local
 !.env.example
 
+# dependencies
+/node_modules
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+/build
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# misc
+*.pem
+npm-debug.log*
+
 # OS
 .DS_Store

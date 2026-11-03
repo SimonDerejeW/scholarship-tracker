@@ -1,0 +1,15 @@
+# Local Postgres for development. Production uses hosted Postgres (ADR 0002).
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: scholarship
+      POSTGRES_PASSWORD: scholarship
+      POSTGRES_DB: scholarship
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:
