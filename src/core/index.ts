@@ -1,5 +1,6 @@
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import { programmeOperations } from "./programmes";
+import { requirementPoolOperations } from "./requirement-pool";
 import type * as schema from "./schema";
 
 export { InvalidInputError, NotFoundError } from "./errors";
@@ -20,6 +21,7 @@ export function createCore({ db, adminEmail }: CoreConfig) {
 
   return {
     ...programmeOperations(db),
+    ...requirementPoolOperations(db),
 
     /** Whether this email may sign in and become a Member. */
     async canSignIn(email: string): Promise<boolean> {

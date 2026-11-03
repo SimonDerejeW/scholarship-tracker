@@ -1,5 +1,7 @@
 import { Suspense } from "react";
 import { addRequirement, editRequirement, removeRequirement } from "@/server/catalog-actions";
+import { core } from "@/server/core";
+import { requireMember } from "@/server/session";
 import { EditableList } from "../../../forms";
 import { ListPageHeader } from "../list-page-header";
 import { loadProgramme } from "../load";
@@ -18,6 +20,8 @@ async function Requirements({
   params,
 }: Pick<PageProps<"/catalog/programmes/[id]/requirements">, "params">) {
   const programme = await loadProgramme(params);
+  const member = await requireMember();
+  const suggestions = await core.suggestRequirements(member.id, programme.id);
 
   return (
     <>
@@ -33,6 +37,7 @@ async function Requirements({
         add={addRequirement.bind(null, programme.id)}
         edit={editRequirement}
         remove={removeRequirement}
+        suggestions={suggestions}
         rowName="Requirement"
       />
     </>

@@ -24,13 +24,6 @@ export type RequirementInput = {
 };
 
 export function programmeOperations(db: Db) {
-  async function requireProgramme(id: number) {
-    const rows = isId(id)
-      ? await db.select({ id: programme.id }).from(programme).where(eq(programme.id, id))
-      : [];
-    found(rows, "Programme");
-  }
-
   return {
     /** Adds a Programme to the Catalog, recording the Member who added it. Returns its id. */
     async addProgramme(memberId: string, input: ProgrammeInput): Promise<number> {
@@ -103,7 +96,7 @@ export function programmeOperations(db: Db) {
     /** Adds a Deadline to a Programme. Returns its id. */
     async addDeadline(_memberId: string, programmeId: number, input: DeadlineInput): Promise<number> {
       const fields = deadlineFields(input);
-      await requireProgramme(programmeId);
+      await requireProgramme(db, programmeId);
       const [row] = await db
         .insert(deadline)
         .values({ ...fields, programmeId })
@@ -133,7 +126,7 @@ export function programmeOperations(db: Db) {
       input: RequirementInput,
     ): Promise<number> {
       const fields = requirementFields(input);
-      await requireProgramme(programmeId);
+      await requireProgramme(db, programmeId);
       const [row] = await db
         .insert(requirement)
         .values({ ...fields, programmeId })
@@ -156,6 +149,14 @@ export function programmeOperations(db: Db) {
       await db.delete(requirement).where(eq(requirement.id, id));
     },
   };
+}
+
+/** Throws NotFoundError unless there is a Programme with this id. */
+export async function requireProgramme(db: Db, id: number) {
+  const rows = isId(id)
+    ? await db.select({ id: programme.id }).from(programme).where(eq(programme.id, id))
+    : [];
+  found(rows, "Programme");
 }
 
 function programmeFields(input: ProgrammeInput) {
