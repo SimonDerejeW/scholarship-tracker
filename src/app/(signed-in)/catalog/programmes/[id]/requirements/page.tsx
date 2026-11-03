@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { Loading } from "@/components/board";
 import { addRequirement, editRequirement, removeRequirement } from "@/server/catalog-actions";
 import { core } from "@/server/core";
 import { requireMember } from "@/server/session";
@@ -10,7 +11,7 @@ export default function RequirementsPage({
   params,
 }: PageProps<"/catalog/programmes/[id]/requirements">) {
   return (
-    <Suspense fallback={<p className="text-foreground/60">Loading…</p>}>
+    <Suspense fallback={<Loading />}>
       <Requirements params={params} />
     </Suspense>
   );

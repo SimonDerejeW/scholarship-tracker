@@ -1,25 +1,147 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
+/* Design sketches and review captures are not app source. */
+@source not "../../.impeccable";
+
+/*
+ * The Departures Board (DESIGN.md). Dark only: there is no light theme.
+ * Components read the semantic tokens below; never hard-code a colour.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Palette */
+  --board: #0e1116;
+  --band: #161a21;
+  --band-hover: #1e232b;
+  --rule: #262b34;
+  --edge: #5c6575;
+  --ink: #f2f2f2;
+  --mute: #8b93a1;
+  --amber: #f4c430;
+  --moving: #3bb273;
+  --missed: #e5484d;
+
+  /* shadcn roles, mapped onto the palette */
+  --background: var(--board);
+  --foreground: var(--ink);
+  --card: var(--band);
+  --card-foreground: var(--ink);
+  --popover: var(--band);
+  --popover-foreground: var(--ink);
+  --primary: var(--amber);
+  --primary-foreground: var(--board);
+  --secondary: var(--band);
+  --secondary-foreground: var(--ink);
+  --muted: var(--band);
+  --muted-foreground: var(--mute);
+  --accent: var(--band-hover);
+  --accent-foreground: var(--ink);
+  /* Red is only ever Missed (#8). Errors are ink with an icon: see ErrorNote. */
+  --destructive: var(--missed);
+  --border: var(--rule);
+  --input: var(--edge);
+  --ring: var(--amber);
+  --radius: 0.25rem;
+
+  color-scheme: dark;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-board: var(--board);
+  --color-band: var(--band);
+  --color-band-hover: var(--band-hover);
+  --color-rule: var(--rule);
+  --color-edge: var(--edge);
+  --color-ink: var(--ink);
+  --color-mute: var(--mute);
+  --color-amber: var(--amber);
+  --color-moving: var(--moving);
+  --color-missed: var(--missed);
+
+  --radius-sm: var(--radius);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) * 1.5);
+
+  /* Barlow for body, Barlow Condensed for the board's chrome, labels and figures */
+  --font-sans: var(--font-barlow), system-ui, sans-serif;
+  --font-display: var(--font-barlow-condensed), var(--font-barlow), system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@theme {
+  /* Type scale: display sizes are set in Barlow Condensed caps */
+  --text-title: 2.125rem;
+  --text-title--line-height: 1.05;
+  --text-section: 1.375rem;
+  --text-section--line-height: 1.1;
+  --text-entry: 1.1875rem;
+  --text-entry--line-height: 1.2;
+  --text-label: 0.875rem;
+  --text-label--line-height: 1.2;
+
+  /* The board's column */
+  --container-board: 60rem;
+  --container-form: 36rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    @apply bg-background font-sans text-foreground;
+    font-variant-numeric: tabular-nums;
+    scrollbar-color: var(--edge) var(--board);
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  ::selection {
+    background: var(--amber);
+    color: var(--board);
+  }
+  input,
+  textarea {
+    caret-color: var(--amber);
+  }
+  a {
+    text-underline-offset: 0.2em;
+  }
+  :focus-visible {
+    outline: 2px solid var(--amber);
+    outline-offset: 2px;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), system-ui, sans-serif;
+@layer components {
+  /* A board heading or label: condensed caps, slightly tracked. */
+  .board-caps {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
 }

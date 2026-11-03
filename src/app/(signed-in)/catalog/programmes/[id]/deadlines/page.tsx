@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { Loading } from "@/components/board";
 import { addDeadline, editDeadline, removeDeadline } from "@/server/catalog-actions";
 import { EditableList } from "../../../forms";
 import { ListPageHeader } from "../list-page-header";
@@ -6,7 +7,7 @@ import { loadProgramme } from "../load";
 
 export default function DeadlinesPage({ params }: PageProps<"/catalog/programmes/[id]/deadlines">) {
   return (
-    <Suspense fallback={<p className="text-foreground/60">Loading…</p>}>
+    <Suspense fallback={<Loading />}>
       <Deadlines params={params} />
     </Suspense>
   );

@@ -22,10 +22,10 @@ export function NavLinks({ pathname }: { pathname?: string }) {
         key={href}
         href={href}
         aria-current={current ? "page" : undefined}
-        className={`-mb-px border-b-2 px-1 py-2 ${
+        className={`-mb-px flex min-h-11 items-center border-b-[3px] font-display text-base font-semibold tracking-[0.06em] uppercase transition-colors duration-150 ${
           current
-            ? "border-foreground font-medium"
-            : "border-transparent text-foreground/60 hover:text-foreground"
+            ? "border-amber text-amber"
+            : "border-transparent text-muted-foreground hover:text-foreground"
         }`}
       >
         {label}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import { Button } from "@/components/ui/button";
 import { signOut } from "@/server/auth-actions";
 import { requireMember } from "@/server/session";
 import { CurrentNavLinks, NavLinks } from "./nav-links";
@@ -7,22 +8,25 @@ import { CurrentNavLinks, NavLinks } from "./nav-links";
 export default function SignedInLayout({ children }: LayoutProps<"/">) {
   return (
     <>
-      <header className="border-b border-foreground/10">
-        <div className="mx-auto flex max-w-2xl items-center justify-between gap-4 px-4 py-3">
-          <Link href="/" className="shrink-0 font-semibold">
+      <header className="border-b border-rule">
+        <div className="mx-auto flex max-w-board items-center justify-between gap-4 px-4 pt-3">
+          <Link
+            href="/"
+            className="shrink-0 font-display text-lg font-bold tracking-[0.06em] uppercase"
+          >
             Scholarship Tracker
           </Link>
           <Suspense>
             <MemberMenu />
           </Suspense>
         </div>
-        <nav className="mx-auto flex max-w-2xl gap-6 px-4 text-sm">
+        <nav aria-label="Main" className="mx-auto mt-1 flex max-w-board gap-6 px-4">
           <Suspense fallback={<NavLinks />}>
             <CurrentNavLinks />
           </Suspense>
         </nav>
       </header>
-      <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-6">{children}</main>
+      <main className="mx-auto w-full max-w-board flex-1 px-4 pt-6 pb-16 sm:pt-8">{children}</main>
     </>
   );
 }
@@ -30,14 +34,11 @@ export default function SignedInLayout({ children }: LayoutProps<"/">) {
 async function MemberMenu() {
   const member = await requireMember();
   return (
-    <form action={signOut} className="flex min-w-0 items-center gap-3 text-sm">
-      <span className="truncate text-foreground/60">{member.email}</span>
-      <button
-        type="submit"
-        className="shrink-0 rounded-md border border-foreground/20 px-3 py-1.5 hover:bg-foreground/5"
-      >
+    <form action={signOut} className="-mr-3 flex min-w-0 items-center gap-1">
+      <span className="truncate text-sm text-muted-foreground">{member.email}</span>
+      <Button type="submit" variant="ghost" size="sm">
         Sign out
-      </button>
+      </Button>
     </form>
   );
 }

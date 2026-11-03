@@ -1,12 +1,12 @@
-import Link from "next/link";
 import { Suspense } from "react";
+import { BackLink, Loading, PageLede, PageTitle } from "@/components/board";
 import { editProgramme } from "@/server/catalog-actions";
 import { ProgrammeForm } from "../../../forms";
 import { loadProgramme } from "../load";
 
 export default function EditProgrammePage({ params }: PageProps<"/catalog/programmes/[id]/edit">) {
   return (
-    <Suspense fallback={<p className="text-foreground/60">Loading…</p>}>
+    <Suspense fallback={<Loading />}>
       <EditProgramme params={params} />
     </Suspense>
   );
@@ -19,14 +19,9 @@ async function EditProgramme({
 
   return (
     <>
-      <Link
-        href={`/catalog/programmes/${programme.id}`}
-        className="text-sm text-foreground/60 hover:underline"
-      >
-        ← {programme.name}
-      </Link>
-      <h1 className="mt-2 text-2xl font-semibold">Edit Programme</h1>
-      <p className="mt-1 text-foreground/60">Changes are shared with everyone in the circle.</p>
+      <BackLink href={`/catalog/programmes/${programme.id}`}>{programme.name}</BackLink>
+      <PageTitle className="mt-2">Edit Programme</PageTitle>
+      <PageLede>Changes are shared with everyone in the circle.</PageLede>
       <ProgrammeForm
         action={editProgramme.bind(null, programme.id)}
         programme={programme}

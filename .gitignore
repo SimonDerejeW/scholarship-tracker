@@ -28,5 +28,6 @@ npm-debug.log*
 # OS
 .DS_Store
 
-# impeccable per-session runtime state (questions/ ignores itself)
+# impeccable per-session runtime state and review screenshots (questions/ ignores itself)
 .impeccable/hook.cache.json
+.impeccable/review/

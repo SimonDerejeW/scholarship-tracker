@@ -1,17 +1,25 @@
 import Link from "next/link";
+import { ExternalLink, Pencil } from "lucide-react";
 import { Suspense } from "react";
+import {
+  BackLink,
+  BoardColumns,
+  BoardRows,
+  boardRow,
+  Loading,
+  PageTitle,
+  SectionHeading,
+} from "@/components/board";
+import { Button } from "@/components/ui/button";
 import { FundingIncluded } from "../../funding-included";
-import { formatDate } from "../../format";
-import { buttonClass } from "../../styles";
+import { dateParts } from "../../format";
 import { loadProgramme } from "./load";
 
 export default function ProgrammePage({ params }: PageProps<"/catalog/programmes/[id]">) {
   return (
     <>
-      <Link href="/catalog" className="text-sm text-foreground/60 hover:underline">
-        ← Catalog
-      </Link>
-      <Suspense fallback={<p className="mt-4 text-foreground/60">Loading…</p>}>
+      <BackLink href="/catalog">Catalog</BackLink>
+      <Suspense fallback={<Loading />}>
         <Programme params={params} />
       </Suspense>
     </>
@@ -25,43 +33,69 @@ async function Programme({ params }: Pick<PageProps<"/catalog/programmes/[id]">,
   return (
     <article>
       <div className="mt-2 flex items-start justify-between gap-4">
-        <h1 className="text-2xl font-semibold">{programme.name}</h1>
-        <Link href={`${base}/edit`} className={`${buttonClass} shrink-0`}>
-          Edit
-        </Link>
+        <PageTitle entryName>{programme.name}</PageTitle>
+        <Button asChild variant="outline" size="sm" className="mt-1">
+          <Link href={`${base}/edit`}>
+            <Pencil aria-hidden />
+            Edit
+          </Link>
+        </Button>
       </div>
-      <p className="mt-1 text-foreground/60">
-        {[programme.university, programme.country].filter(Boolean).join(" · ")}
+      <p className="mt-2 text-lg">
+        {programme.university}
+        {programme.country && <span className="text-muted-foreground"> · {programme.country}</span>}
       </p>
-      {programme.fundingIncluded && <FundingIncluded />}
-      {programme.link && (
+      {programme.fundingIncluded && (
         <p className="mt-3">
+          <FundingIncluded />
+        </p>
+      )}
+      {programme.link && (
+        <p className="mt-4">
           <a
             href={programme.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="break-all underline"
+            className="inline-flex max-w-full items-center gap-1.5 break-all underline decoration-edge transition-colors duration-150 hover:text-amber hover:decoration-amber"
           >
             {programme.link}
+            <ExternalLink className="size-4 shrink-0" aria-label="(opens in a new tab)" />
           </a>
         </p>
       )}
-      {programme.notes && <p className="mt-4 whitespace-pre-wrap">{programme.notes}</p>}
+      {programme.notes && <p className="mt-4 max-w-prose whitespace-pre-wrap">{programme.notes}</p>}
 
       <Section title="Deadlines" editHref={`${base}/deadlines`}>
         {programme.deadlines.length === 0 ? (
           <Empty>No Deadlines yet. Add them once they&apos;re announced.</Empty>
         ) : (
-          <ul className="flex flex-col gap-2">
-            {programme.deadlines.map((deadline) => (
-              <li key={deadline.id} className="flex flex-col sm:flex-row sm:gap-4">
-                <span className="shrink-0 font-medium tabular-nums sm:w-36">
-                  {formatDate(deadline.date)}
-                </span>
-                <span>{deadline.label}</span>
-              </li>
-            ))}
-          </ul>
+          <>
+            <BoardColumns className="flex gap-4">
+              <span className="w-24 shrink-0">Date</span>
+              <span>Deadline</span>
+            </BoardColumns>
+            <BoardRows>
+              {programme.deadlines.map((deadline) => {
+                const date = dateParts(deadline.date);
+                return (
+                  <li key={deadline.id} className={`${boardRow} flex items-baseline gap-4`}>
+                    <time
+                      dateTime={deadline.date}
+                      className="w-24 shrink-0 font-display leading-tight"
+                    >
+                      <span className="block text-entry font-semibold text-amber uppercase">
+                        {date.dayMonth}
+                      </span>
+                      <span className="block text-label tracking-[0.06em] text-muted-foreground uppercase">
+                        {date.weekday} {date.year}
+                      </span>
+                    </time>
+                    <span className="min-w-0">{deadline.label}</span>
+                  </li>
+                );
+              })}
+            </BoardRows>
+          </>
         )}
       </Section>
 
@@ -69,23 +103,34 @@ async function Programme({ params }: Pick<PageProps<"/catalog/programmes/[id]">,
         {programme.requirements.length === 0 ? (
           <Empty>No Requirements yet.</Empty>
         ) : (
-          <ul className="flex list-disc flex-col gap-1 pl-5">
-            {programme.requirements.map((requirement) => (
-              <li key={requirement.id}>
-                {requirement.label}
-                {requirement.note && (
-                  <span className="text-foreground/60"> — {requirement.note}</span>
-                )}
-              </li>
-            ))}
-          </ul>
+          <>
+            <BoardColumns className={requirementColumns}>
+              <span>Requirement</span>
+              <span className="hidden sm:block">Note</span>
+            </BoardColumns>
+            <BoardRows>
+              {programme.requirements.map((requirement) => (
+                <li key={requirement.id} className={`${boardRow} ${requirementColumns}`}>
+                  <span className="block font-medium">{requirement.label}</span>
+                  {requirement.note && (
+                    <span className="block text-sm text-muted-foreground sm:text-base">
+                      {requirement.note}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </BoardRows>
+          </>
         )}
       </Section>
 
-      <p className="mt-8 text-sm text-foreground/60">Added by {programme.addedBy.name}</p>
+      <p className="mt-10 text-sm text-muted-foreground">Added by {programme.addedBy.name}</p>
     </article>
   );
 }
+
+/** Requirements: label over note on a phone, two columns on desktop. */
+const requirementColumns = "sm:grid sm:grid-cols-2 sm:gap-6";
 
 function Section({
   title,
@@ -97,18 +142,23 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="mt-8">
-      <div className="mb-3 flex items-center justify-between gap-4">
-        <h2 className="text-lg font-semibold">{title}</h2>
-        <Link href={editHref} className={buttonClass}>
-          Edit {title}
-        </Link>
-      </div>
+    <section className="mt-10">
+      <SectionHeading
+        action={
+          <Button asChild variant="outline" size="sm">
+            <Link href={editHref}>
+              Edit <span className="sr-only">{title}</span>
+            </Link>
+          </Button>
+        }
+      >
+        {title}
+      </SectionHeading>
       {children}
     </section>
   );
 }
 
 function Empty({ children }: { children: React.ReactNode }) {
-  return <p className="text-foreground/60">{children}</p>;
+  return <p className="py-4 text-muted-foreground">{children}</p>;
 }

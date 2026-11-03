@@ -1,7 +1,10 @@
 {
   "detector": {
     "ignoreRules": [],
-    "ignoreFiles": [],
+    "ignoreFiles": [
+      ".impeccable/mocks/decision/assigned.html",
+      ".impeccable/mocks/decision/canon.html"
+    ],
     "ignoreValues": [
       {
         "rule": "overused-font",
@@ -11,6 +14,33 @@
         ],
         "createdAt": "2026-11-03T14:41:52.220Z",
         "reason": "Claude decided: canon.html is the decision round's category-standard card, which deliberately renders the generic default; not shipped UI"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "archivo",
+        "files": [
+          ".impeccable/mocks/decision/assigned.html"
+        ],
+        "createdAt": "2026-11-03T15:16:08.531Z",
+        "reason": "Claude decided: rejected decision-round sketch (not shipped UI); it deliberately renders a non-chosen direction's fonts"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "noto sans ethiopic",
+        "files": [
+          ".impeccable/mocks/decision/assigned.html"
+        ],
+        "createdAt": "2026-11-03T15:16:08.550Z",
+        "reason": "Claude decided: rejected decision-round sketch (not shipped UI); it deliberately renders a non-chosen direction's fonts"
+      },
+      {
+        "rule": "design-system-font",
+        "value": "inter",
+        "files": [
+          ".impeccable/mocks/decision/canon.html"
+        ],
+        "createdAt": "2026-11-03T15:16:08.569Z",
+        "reason": "Claude decided: rejected decision-round sketch (not shipped UI); it deliberately renders a non-chosen direction's fonts"
       }
     ]
   }
