@@ -12,6 +12,8 @@ colors:
   amber: "#f4c430"
   moving: "#3bb273"
   missed: "#e5484d"
+  flap: "#05070a"
+  flap-split: "#000000"
 typography:
   title:
     fontFamily: "Barlow Condensed, Barlow, system-ui, sans-serif"
@@ -161,13 +163,13 @@ The metaphor is visual only. Copy speaks the product's own vocabulary from GLOSS
 A near-black, blue-cast board with one warm signal colour and two reserved status colours.
 
 ### Primary
-- **Board Amber** (`amber`): the signal. Marks the current nav tab (text and 3px underline), dates in date columns (and, from #8, days left), and the filled primary action. It is also the interaction colour: the 2px focus outline, the text caret and text selection. Link hover turns amber; links at rest do not.
+- **Board Amber** (`amber`): the signal. Marks the current nav tab (text and 3px underline), dates in date columns and days left on Upcoming, and the filled primary action. On Upcoming it also lights an Interested Application due within 30 days (a 3px left rule and its Stage word): that is the soonest thing to do, so it counts as "dates and days left". It is also the interaction colour: the 2px focus outline, the text caret and text selection. Link hover turns amber; links at rest do not.
 
 ### Secondary
-- **Moving Green** (`moving`): reserved for Stages that are moving on Applications (#8). Not used on any shipped screen yet.
+- **Moving Green** (`moving`): the Stage word on Upcoming when an Application is moving (Preparing, Submitted, Interview). Nothing else.
 
 ### Tertiary
-- **Missed Red** (`missed`): reserved for the Missed flag on Applications (#8). It is mapped to shadcn's destructive role but nothing renders it today, and nothing else may.
+- **Missed Red** (`missed`): the Missed flag on Upcoming: the MISSED word in the days column and the row's Stage word. It is mapped to shadcn's destructive role, but nothing else may render it.
 
 ### Neutral
 - **Departures Hall** (`board`): the page ground, header and form backgrounds. The browser theme colour is the same value, written as the one sanctioned literal hex in the viewport metadata because Next metadata cannot read CSS variables.
@@ -176,10 +178,11 @@ A near-black, blue-cast board with one warm signal colour and two reserved statu
 - **Hairline** (`rule`): the default border on everything: row rules, the header's bottom rule, section heading underlines, column strip rules.
 - **Edge** (`edge`): the visible stroke on things you interact with or that need a frame: inputs, outline buttons, tags, chips, error notes, link underlines, scrollbar thumb.
 - **Board Ink** (`ink`): primary text, and the text on every non-primary button.
+- **Flap** (`flap`, `flap-split`): the split-flap tiles' face, a shade below the board, and the hairline splitting each tile across its middle.
 - **Mute** (`mute`): secondary text: ledes, hints, university/country lines, column strips, inactive nav tabs, the back link, placeholders; also the hover stroke on inputs and checkboxes.
 
 ### Named Rules
-**The Three Ambers Rule.** Outside focus, caret and selection, amber marks exactly three things: the current nav item, dates (and days left), and the primary action. If a fourth thing wants amber, it does not get it.
+**The Three Ambers Rule.** Outside focus, caret and selection, amber marks exactly three things: the current nav item, dates (and days left), and the primary action. If a fourth thing wants amber, it does not get it. The one extension of "dates" is Upcoming's 30-day highlight (left rule and Stage word): it flags the soonest Deadline to act on.
 
 **The Red Means Missed Rule.** Red is only the Missed flag. Errors are ink text with an alert icon inside an edge-bordered band (ErrorNote); an invalid input swaps its edge stroke for ink. Never red.
 
@@ -212,6 +215,8 @@ A near-black, blue-cast board with one warm signal colour and two reserved statu
 One centred column. The board column is 60rem (960px) wide with a 16px side gutter; forms sit inside it at a 36rem (576px) maximum; standalone pages (sign-in, not-invited, root not-found) use a narrow 24rem column, vertically centred.
 
 The shell is a header with the wordmark and member menu on one line and the nav tabs on the next, closed by a hairline that the current tab's underline overlaps. Main content starts 24px below (32px from the sm breakpoint) and ends with 64px of runout.
+
+One extra breakpoint, `wide` (60rem, the board column's width), is where Upcoming spreads into its full five columns.
 
 Board rows go full-bleed on a phone (they bleed through the 16px gutter) and sit inside the column from 640px up. On a phone each row stacks its lead line over a mute detail line joined by a middle dot; from 640px up the column strip appears and rows become a grid (Catalog: a 96px Deadline column, then Programme 1.6fr, University 1.2fr, Country 0.7fr, or Scholarship 1.6fr, Provider 1fr, Covers 0.9fr; Requirements: two equal columns; Deadlines: a 96px date column then the label). Editor rows take their grid from a per-list column variable: date fields fixed at 11rem, text fields sharing the rest, then the buttons.
 
@@ -265,16 +270,19 @@ The board itself. A list sits under a column strip (column-label type, mute, rul
 - **Empty board:** a Row Band panel between rules, centred, an entry-size caps title over a mute line saying what will appear and how.
 - **Error note:** an alert line icon and medium ink text in an edge-bordered Row Band box, 4px corners, 12px padding. States what went wrong and how to recover.
 
-### Planned in #8 (not shipped)
-- **Upcoming rows** on the board pattern above, each with split-flap days-left tiles that flip in once on load, staggered row by row, and stay static under reduced motion. Days left are amber.
-- **Interested rows** due within 30 days get a highlight.
-- **Stage and Missed flags** introduce Moving Green and Missed Red, under the Color rules above.
+### Upcoming (the home board)
+- **Header:** UPCOMING with today's date and "Addis Ababa" in mute label caps beneath; the Stage filter (a native select restyled as an input in condensed caps: OPEN STAGES, each Stage, ALL STAGES) sits bottom-aligned on the right. The choice lives in the address (`?stage=`).
+- **Rows:** each whole row is one link to its Application; no inline actions. On a phone: Date / Application / Days, with the Stage word, Checklist progress (e.g. 3/4) and the Deadline's label on the Application's second line. From `wide`: a column strip and Date / Application (name over provider or university and the Deadline's label) / Stage / Checklist / Days.
+- **Days left:** split-flap tiles, amber figures on Flap, 4px corners, 32px tall, two tiles (three from 100 days), "– –" in mute for Deadline TBA, with DAYS (DAY, TODAY) in small mute caps below. They flip in once on load, staggered down the board, and are static under reduced motion.
+- **Stage word:** label caps; green while moving, ink at Interested, mute once finished (Accepted, Rejected, Withdrawn), amber when highlighted, red when Missed.
+- **Highlight:** an Interested Application whose next Deadline is at most 30 days off gets a 3px amber left rule and an amber Stage word.
+- **Missed:** the last Deadline's date and the name drop to mute, the Stage word and a bold MISSED in the days column turn red. A later-Stage Application whose Deadlines have all passed shows its last date in mute and PASSED in mute caps. Entries with no Deadlines show TBA and "Deadline TBA".
 
 ## Do's and Don'ts
 
 ### Do:
 - **Do** stay dark only; there is no light theme to support.
-- **Do** keep amber to the current nav item, dates (and days left), and the primary action, plus focus, caret and selection.
+- **Do** keep amber to the current nav item, dates (and days left, and Upcoming's 30-day highlight), and the primary action, plus focus, caret and selection.
 - **Do** show errors as ink text with an alert icon and an edge border (ErrorNote).
 - **Do** build lists as banded board rows with hairline rules under a condensed-caps column strip.
 - **Do** keep entry names in their typed case; set chrome, headings, labels, buttons and figures in condensed caps.
@@ -286,7 +294,7 @@ The board itself. A list sits under a column strip (column-label type, mute, rul
 ### Don't:
 - **Don't** use red for anything but Missed; never for errors, validation or destructive buttons.
 - **Don't** use amber for links at rest, icons, tags, or decoration; links are ink with an edge underline and turn amber only on hover.
-- **Don't** use green until moving Stages exist (#8), and then only for them.
+- **Don't** use green for anything but moving Stages on Upcoming.
 - **Don't** borrow departures language in copy: "Missed", never "Gate closed"; no "boarding soon".
 - **Don't** uppercase Programme names or any other typed entry.
 - **Don't** use cards, shadows or pills.

@@ -1,4 +1,4 @@
-import { and, asc, eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { InvalidInputError } from "./errors";
 import { KINDS, owner, requireEntry, type CatalogEntry } from "./entries";
 import { found, isId, optional } from "./fields";
@@ -29,14 +29,6 @@ export function applicationOperations(db: Db) {
         );
       }
       return row.id;
-    },
-
-    /** This Member's Applications, by the name of what each is to. */
-    async listApplications(memberId: string) {
-      const rows = await applications(db)
-        .where(eq(application.memberId, memberId))
-        .orderBy(sql`lower(coalesce(${programme.name}, ${scholarship.name}))`, asc(application.id));
-      return rows.map(withEntry);
     },
 
     /** One of this Member's Applications with what it is to, or null if they have none with this id. */
@@ -85,7 +77,7 @@ export function applicationOperations(db: Db) {
 }
 
 /** Applications joined to the Programme or Scholarship each is to. */
-function applications(db: Db) {
+export function applications(db: Db) {
   return db
     .select({
       id: application.id,
@@ -100,10 +92,13 @@ function applications(db: Db) {
     .$dynamic();
 }
 
+/** Orders `applications` rows by the name of what each is to, ignoring case. */
+export const byEntryName = sql`lower(coalesce(${programme.name}, ${scholarship.name}))`;
+
 type Row = Awaited<ReturnType<ReturnType<typeof applications>["execute"]>>[number];
 
 /** An Application with its entry: the Programme's university, or the Scholarship's provider, as detail. */
-function withEntry({ programme, scholarship, ...row }: Row) {
+export function withEntry({ programme, scholarship, ...row }: Row) {
   const entry = programme
     ? { kind: "programme" as const, ...programme }
     : { kind: "scholarship" as const, ...scholarship! };
@@ -132,6 +127,6 @@ async function updateMine(
   found(rows, "Application");
 }
 
-function isStage(value: string): value is Stage {
+export function isStage(value: string): value is Stage {
   return (STAGES as readonly string[]).includes(value);
 }

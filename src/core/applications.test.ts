@@ -8,6 +8,7 @@ function setup(db: Db) {
 
 const robotics = { name: "MSc Robotics", university: "TU Delft", fundingIncluded: false };
 const daad = { name: "DAAD Study Scholarship", provider: "DAAD" };
+const today = "2026-11-03";
 
 describe("starting an Application", () => {
   test("to a Programme begins at Interested, with no notes", async ({ db }) => {
@@ -41,7 +42,7 @@ describe("one Application per Catalog entry", () => {
     await expect(core.startApplication(ana.id, scholarshipEntry(scholarshipId))).rejects.toThrow(
       new InvalidInputError("You already have an Application to this Scholarship."),
     );
-    expect(await core.listApplications(ana.id)).toHaveLength(2);
+    expect(await core.upcoming(ana.id, today, "all")).toHaveLength(2);
   });
 
   test("a Programme and a Scholarship sharing an id are different entries", async ({ db }) => {
@@ -55,7 +56,12 @@ describe("one Application per Catalog entry", () => {
     const id = await core.startApplication(ana.id, scholarshipEntry(scholarshipId));
 
     expect(await core.getApplication(ana.id, id)).toMatchObject({
-      entry: { kind: "scholarship", id: scholarshipId, name: "DAAD Study Scholarship", detail: "DAAD" },
+      entry: {
+        kind: "scholarship",
+        id: scholarshipId,
+        name: "DAAD Study Scholarship",
+        detail: "DAAD",
+      },
     });
   });
 
@@ -68,7 +74,7 @@ describe("one Application per Catalog entry", () => {
     await core.startApplication(ana.id, programmeEntry(programmeId));
     await core.startApplication(bo.id, programmeEntry(programmeId));
 
-    expect(await core.listApplications(bo.id)).toMatchObject([
+    expect(await core.upcoming(bo.id, today, "all")).toMatchObject([
       { stage: "Interested", entry: { name: "MSc Robotics" } },
     ]);
   });
@@ -146,7 +152,7 @@ describe("deleting an Application", () => {
     await core.deleteApplication(ana.id, id);
 
     expect(await core.getApplication(ana.id, id)).toBeNull();
-    expect(await core.listApplications(ana.id)).toEqual([]);
+    expect(await core.upcoming(ana.id, today, "all")).toEqual([]);
     expect(await core.applicationTo(ana.id, programmeEntry(programmeId))).toBeNull();
     const again = await core.startApplication(ana.id, programmeEntry(programmeId));
     expect((await core.getApplication(ana.id, again))?.stage).toBe("Interested");
@@ -190,7 +196,7 @@ describe("an Application's privacy", () => {
     await core.editApplicationNotes(ana.id, id, "Ask Prof. X");
 
     expect(await core.getApplication(bo.id, id)).toBeNull();
-    expect(await core.listApplications(bo.id)).toEqual([]);
+    expect(await core.upcoming(bo.id, today, "all")).toEqual([]);
     expect(await core.applicationTo(bo.id, programmeEntry(programmeId))).toBeNull();
     await expect(core.setStage(bo.id, id, "Withdrawn")).rejects.toThrow(
       new NotFoundError("That Application no longer exists."),

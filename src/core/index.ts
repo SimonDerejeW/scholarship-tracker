@@ -6,9 +6,12 @@ import { programmeOperations } from "./programmes";
 import { requirementPoolOperations } from "./requirement-pool";
 import { scholarshipOperations } from "./scholarships";
 import type * as schema from "./schema";
+import { upcomingOperations } from "./upcoming";
 
 export type { Stage } from "./applications";
 export type { CatalogEntry } from "./entries";
+export type { StageFilter } from "./upcoming";
+export { MOVING_STAGES, OPEN_STAGES, toStageFilter } from "./upcoming";
 export { STAGES } from "./schema";
 export { InvalidInputError, NotFoundError } from "./errors";
 
@@ -33,6 +36,7 @@ export function createCore({ db, adminEmail }: CoreConfig) {
     ...requirementPoolOperations(db),
     ...applicationOperations(db),
     ...checklistOperations(db),
+    ...upcomingOperations(db),
 
     /** Whether this email may sign in and become a Member. */
     async canSignIn(email: string): Promise<boolean> {

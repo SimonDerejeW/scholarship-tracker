@@ -21,6 +21,9 @@
   --amber: #f4c430;
   --moving: #3bb273;
   --missed: #e5484d;
+  /* Split-flap tiles: a little darker than the board, split across the middle */
+  --flap: #05070a;
+  --flap-split: #000000;
 
   /* shadcn roles, mapped onto the palette */
   --background: var(--board);
@@ -77,6 +80,8 @@
   --color-amber: var(--amber);
   --color-moving: var(--moving);
   --color-missed: var(--missed);
+  --color-flap: var(--flap);
+  --color-flap-split: var(--flap-split);
 
   --radius-sm: var(--radius);
   --radius-md: var(--radius);
@@ -101,6 +106,9 @@
   /* The board's column */
   --container-board: 60rem;
   --container-form: 36rem;
+
+  /* Wide enough for the whole board column: Upcoming spreads into its full columns */
+  --breakpoint-wide: 60rem;
 }
 
 @layer base {
@@ -143,5 +151,29 @@
     font-family: var(--font-display);
     text-transform: uppercase;
     letter-spacing: 0.04em;
+  }
+
+  /* A split-flap tile flips down into place once, after its --flap-delay. */
+  .flap-in {
+    animation: flap-in 420ms cubic-bezier(0.2, 0.7, 0.3, 1) var(--flap-delay, 0ms) both;
+    transform-origin: 50% 50%;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .flap-in {
+      animation: none;
+    }
+  }
+}
+
+@keyframes flap-in {
+  from {
+    transform: perspective(200px) rotateX(-90deg);
+    opacity: 0;
+  }
+  60% {
+    opacity: 1;
+  }
+  to {
+    transform: perspective(200px) rotateX(0deg);
   }
 }
