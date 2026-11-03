@@ -1,4 +1,4 @@
-import { boolean, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, date, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 // Better Auth's tables. Its "user" model is mapped to `member` (see GLOSSARY.md).
 
@@ -50,4 +50,40 @@ export const verification = pgTable("verification", {
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// The Catalog.
+
+export const programme = pgTable("programme", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  name: text("name").notNull(),
+  university: text("university").notNull(),
+  country: text("country"),
+  link: text("link"),
+  fundingIncluded: boolean("funding_included").notNull().default(false),
+  notes: text("notes"),
+  addedBy: text("added_by")
+    .notNull()
+    .references(() => member.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+/** Date-only: an exact cutoff time, if any, lives in the label. */
+export const deadline = pgTable("deadline", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  programmeId: integer("programme_id")
+    .notNull()
+    .references(() => programme.id, { onDelete: "cascade" }),
+  label: text("label").notNull(),
+  date: date("date", { mode: "string" }).notNull(),
+});
+
+export const requirement = pgTable("requirement", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  programmeId: integer("programme_id")
+    .notNull()
+    .references(() => programme.id, { onDelete: "cascade" }),
+  label: text("label").notNull(),
+  note: text("note"),
 });

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { signOut } from "@/server/auth-actions";
 import { requireMember } from "@/server/session";
+import { CurrentNavLinks, NavLinks } from "./nav-links";
 
 export default function SignedInLayout({ children }: LayoutProps<"/">) {
   return (
@@ -15,6 +16,11 @@ export default function SignedInLayout({ children }: LayoutProps<"/">) {
             <MemberMenu />
           </Suspense>
         </div>
+        <nav className="mx-auto flex max-w-2xl gap-6 px-4 text-sm">
+          <Suspense fallback={<NavLinks />}>
+            <CurrentNavLinks />
+          </Suspense>
+        </nav>
       </header>
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-6">{children}</main>
     </>

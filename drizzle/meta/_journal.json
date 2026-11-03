@@ -8,6 +8,13 @@
       "when": 1793710000582,
       "tag": "0000_init",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1793712626789,
+      "tag": "0001_catalog_programmes",
+      "breakpoints": true
     }
   ]
 }

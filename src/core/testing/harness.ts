@@ -2,6 +2,7 @@ import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import { test as base } from "vitest";
+import type { Db } from "@/core";
 import * as schema from "@/core/schema";
 
 // One migrated in-memory Postgres per test file; each test gets a fresh clone of it.
@@ -19,3 +20,13 @@ export const test = base.extend("db", async ({}, { onCleanup }) => {
   onCleanup(() => pg.close());
   return drizzle(pg, { schema });
 });
+
+let memberCount = 0;
+
+/** A signed-up Member. Better Auth creates these in the app, so tests insert them directly. */
+export async function addMember(db: Db, { name }: { name: string }) {
+  const id = `member-${++memberCount}`;
+  const email = `${id}@example.com`;
+  await db.insert(schema.member).values({ id, name, email });
+  return { id, name, email };
+}
