@@ -14,6 +14,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { core } from "@/server/core";
 import { requireMember } from "@/server/session";
+import { today } from "@/server/today";
+import { DateBlock } from "./date-block";
 import { FundingIncluded } from "./funding-included";
 import { entryHref } from "./routes";
 
@@ -30,48 +32,72 @@ export default function CatalogPage() {
 
 async function Boards() {
   const member = await requireMember();
+  const date = await today();
   const [programmes, scholarships] = await Promise.all([
-    core.listProgrammes(member.id),
-    core.listScholarships(member.id),
+    core.listProgrammes(member.id, date),
+    core.listScholarships(member.id, date),
   ]);
+  const boards = [
+    { id: "programmes", title: "Programmes", count: programmes.length },
+    { id: "scholarships", title: "Scholarships", count: scholarships.length },
+  ];
 
   return (
-    <div className="mt-6 flex flex-col gap-10">
-      <Board title="Programmes" addHref="/catalog/programmes/new" addLabel="Add Programme">
-        {programmes.length === 0 ? (
-          <EmptyBoard title="No Programmes yet">
-            Add a master&apos;s Programme you&apos;ve found so everyone in the circle can see it.
-          </EmptyBoard>
-        ) : (
-          <Programmes programmes={programmes} />
-        )}
-      </Board>
-      <Board title="Scholarships" addHref="/catalog/scholarships/new" addLabel="Add Scholarship">
-        {scholarships.length === 0 ? (
-          <EmptyBoard title="No Scholarships yet">
-            Add funding that&apos;s applied for separately from a Programme, like DAAD or Chevening.
-          </EmptyBoard>
-        ) : (
-          <Scholarships scholarships={scholarships} />
-        )}
-      </Board>
-    </div>
+    <>
+      <nav aria-label="Boards" className="mt-1 flex gap-5 sm:hidden">
+        {boards.map((board) => (
+          <a
+            key={board.id}
+            href={`#${board.id}`}
+            className="flex min-h-11 items-center gap-1.5 font-display text-base font-semibold tracking-[0.06em] uppercase underline decoration-edge underline-offset-4 transition-colors duration-150 hover:text-amber hover:decoration-amber"
+          >
+            {board.title}
+            <span className="text-muted-foreground">{board.count}</span>
+          </a>
+        ))}
+      </nav>
+      <div className="mt-4 flex flex-col gap-10 sm:mt-6">
+        <Board {...boards[0]} addHref="/catalog/programmes/new" addLabel="Add Programme">
+          {programmes.length === 0 ? (
+            <EmptyBoard title="No Programmes yet">
+              Add a master&apos;s Programme you&apos;ve found so everyone in the circle can see it.
+            </EmptyBoard>
+          ) : (
+            <Programmes programmes={programmes} />
+          )}
+        </Board>
+        <Board {...boards[1]} addHref="/catalog/scholarships/new" addLabel="Add Scholarship">
+          {scholarships.length === 0 ? (
+            <EmptyBoard title="No Scholarships yet">
+              Add funding that&apos;s applied for separately from a Programme, like DAAD or
+              Chevening.
+            </EmptyBoard>
+          ) : (
+            <Scholarships scholarships={scholarships} />
+          )}
+        </Board>
+      </div>
+    </>
   );
 }
 
 function Board({
+  id,
   title,
+  count,
   addHref,
   addLabel,
   children,
 }: {
+  id: string;
   title: string;
+  count: number;
   addHref: string;
   addLabel: string;
   children: React.ReactNode;
 }) {
   return (
-    <section>
+    <section id={id} className="scroll-mt-4">
       <SectionHeading
         action={
           <Button asChild variant="outline" size="sm" className="shrink-0">
@@ -82,14 +108,31 @@ function Board({
           </Button>
         }
       >
-        {title}
+        {title} <span className="text-muted-foreground">{count}</span>
       </SectionHeading>
       {children}
     </section>
   );
 }
 
-/** Desktop columns: Programme, University, Country. */
+type NextDeadline = { nextDeadline: { date: string } | null; deadlinesPassed: boolean };
+
+/** A row's lead: its next Deadline's date, or why there is none to show. */
+function NextDeadlineCell({ nextDeadline, deadlinesPassed }: NextDeadline) {
+  if (nextDeadline) {
+    return <DateBlock date={nextDeadline.date} />;
+  }
+  return (
+    <span className="block w-24 shrink-0 font-display text-entry leading-tight font-semibold text-muted-foreground uppercase">
+      {deadlinesPassed ? "Passed" : "TBA"}
+    </span>
+  );
+}
+
+/** Each row leads with its next Deadline; the rest is stacked on a phone, columns on desktop. */
+const rowLayout = "flex items-baseline gap-4";
+
+/** Desktop columns after the Deadline: Programme, University, Country. */
 const programmeColumns =
   "sm:grid sm:grid-cols-[minmax(0,1.6fr)_minmax(0,1.2fr)_minmax(0,0.7fr)] sm:gap-6";
 
@@ -100,32 +143,40 @@ function Programmes({
 }) {
   return (
     <>
-      <BoardColumns className={programmeColumns}>
-        <span>Programme</span>
-        <span className="hidden sm:block">University</span>
-        <span className="hidden sm:block">Country</span>
+      <BoardColumns className="hidden sm:flex sm:gap-4">
+        <span className="w-24 shrink-0">Deadline</span>
+        <span className={`flex-1 ${programmeColumns}`}>
+          <span>Programme</span>
+          <span>University</span>
+          <span>Country</span>
+        </span>
       </BoardColumns>
-      <BoardRows>
+      <BoardRows className="border-t border-rule sm:border-t-0">
         {programmes.map((programme) => (
           <li key={programme.id} className={boardRowShell}>
             <Link
               href={entryHref({ kind: "programme", id: programme.id })}
-              className={`${boardRowLink} ${programmeColumns}`}
+              className={`${boardRowLink} ${rowLayout}`}
             >
-              <span className="block">
-                <span className="block font-display text-entry font-semibold">{programme.name}</span>
-                {programme.fundingIncluded && (
-                  <span className="mt-1.5 block">
-                    <FundingIncluded />
+              <NextDeadlineCell {...programme} />
+              <span className={`block min-w-0 flex-1 ${programmeColumns}`}>
+                <span className="block">
+                  <span className="block font-display text-entry font-semibold">
+                    {programme.name}
                   </span>
-                )}
-              </span>
-              <span className="mt-1 block text-sm text-muted-foreground sm:mt-0 sm:pt-px sm:text-base sm:text-foreground">
-                {programme.university}
-                {programme.country && <span className="sm:hidden"> · {programme.country}</span>}
-              </span>
-              <span className="hidden pt-px text-muted-foreground sm:block">
-                {programme.country}
+                  {programme.fundingIncluded && (
+                    <span className="mt-1.5 block">
+                      <FundingIncluded />
+                    </span>
+                  )}
+                </span>
+                <span className="mt-1 block text-sm text-muted-foreground sm:mt-0 sm:pt-px sm:text-base sm:text-foreground">
+                  {programme.university}
+                  {programme.country && <span className="sm:hidden"> · {programme.country}</span>}
+                </span>
+                <span className="hidden pt-px text-muted-foreground sm:block">
+                  {programme.country}
+                </span>
               </span>
             </Link>
           </li>
@@ -135,7 +186,7 @@ function Programmes({
   );
 }
 
-/** Desktop columns: Scholarship, Provider, What it covers. */
+/** Desktop columns after the Deadline: Scholarship, Provider, What it covers. */
 const scholarshipColumns =
   "sm:grid sm:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)_minmax(0,0.9fr)] sm:gap-6";
 
@@ -146,29 +197,35 @@ function Scholarships({
 }) {
   return (
     <>
-      <BoardColumns className={scholarshipColumns}>
-        <span>Scholarship</span>
-        <span className="hidden sm:block">Provider</span>
-        <span className="hidden sm:block">Covers</span>
+      <BoardColumns className="hidden sm:flex sm:gap-4">
+        <span className="w-24 shrink-0">Deadline</span>
+        <span className={`flex-1 ${scholarshipColumns}`}>
+          <span>Scholarship</span>
+          <span>Provider</span>
+          <span>Covers</span>
+        </span>
       </BoardColumns>
-      <BoardRows>
+      <BoardRows className="border-t border-rule sm:border-t-0">
         {scholarships.map((scholarship) => (
           <li key={scholarship.id} className={boardRowShell}>
             <Link
               href={entryHref({ kind: "scholarship", id: scholarship.id })}
-              className={`${boardRowLink} ${scholarshipColumns}`}
+              className={`${boardRowLink} ${rowLayout}`}
             >
-              <span className="block font-display text-entry font-semibold">
-                {scholarship.name}
-              </span>
-              <span className="mt-1 block text-sm text-muted-foreground sm:mt-0 sm:pt-px sm:text-base sm:text-foreground">
-                {scholarship.provider}
-              </span>
-              {scholarship.coverage && (
-                <span className="mt-0.5 line-clamp-2 text-sm text-muted-foreground sm:mt-0 sm:pt-px sm:text-base">
-                  {scholarship.coverage}
+              <NextDeadlineCell {...scholarship} />
+              <span className={`block min-w-0 flex-1 ${scholarshipColumns}`}>
+                <span className="block font-display text-entry font-semibold">
+                  {scholarship.name}
                 </span>
-              )}
+                <span className="mt-1 block text-sm text-muted-foreground sm:mt-0 sm:pt-px sm:text-base sm:text-foreground">
+                  {scholarship.provider}
+                </span>
+                {scholarship.coverage && (
+                  <span className="mt-0.5 line-clamp-2 text-sm text-muted-foreground sm:mt-0 sm:pt-px sm:text-base">
+                    {scholarship.coverage}
+                  </span>
+                )}
+              </span>
             </Link>
           </li>
         ))}

@@ -3,7 +3,7 @@ import { ExternalLink, Pencil } from "lucide-react";
 import { BoardColumns, BoardRows, boardRow, PageTitle, SectionHeading } from "@/components/board";
 import { Button } from "@/components/ui/button";
 import type { CatalogEntry } from "@/core";
-import { dateParts } from "./format";
+import { DateBlock } from "./date-block";
 import { entryHref } from "./routes";
 
 type Entry = {
@@ -76,25 +76,12 @@ export function EntryDetail({
               <span>Deadline</span>
             </BoardColumns>
             <BoardRows>
-              {data.deadlines.map((deadline) => {
-                const date = dateParts(deadline.date);
-                return (
-                  <li key={deadline.id} className={`${boardRow} flex items-baseline gap-4`}>
-                    <time
-                      dateTime={deadline.date}
-                      className="w-24 shrink-0 font-display leading-tight"
-                    >
-                      <span className="block text-entry font-semibold text-amber uppercase">
-                        {date.dayMonth}
-                      </span>
-                      <span className="block text-label tracking-[0.06em] text-muted-foreground uppercase">
-                        {date.weekday} {date.year}
-                      </span>
-                    </time>
-                    <span className="min-w-0">{deadline.label}</span>
-                  </li>
-                );
-              })}
+              {data.deadlines.map((deadline) => (
+                <li key={deadline.id} className={`${boardRow} flex items-baseline gap-4`}>
+                  <DateBlock date={deadline.date} />
+                  <span className="min-w-0">{deadline.label}</span>
+                </li>
+              ))}
             </BoardRows>
           </>
         )}

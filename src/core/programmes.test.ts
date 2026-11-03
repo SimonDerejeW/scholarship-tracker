@@ -226,7 +226,7 @@ describe("Programme input", () => {
     await expect(core.addProgramme(ana.id, { ...erasmus, university: "" })).rejects.toThrow(
       new InvalidInputError("A Programme needs a university."),
     );
-    expect(await core.listProgrammes(ana.id)).toEqual([]);
+    expect(await core.listProgrammes(ana.id, "2027-01-01")).toEqual([]);
   });
 
   test("trims text and leaves blank optional fields empty", async ({ db }) => {
@@ -303,11 +303,62 @@ describe("the Catalog", () => {
       university: "KU Leuven",
     });
 
-    const programmes = await core.listProgrammes(ana.id);
+    const programmes = await core.listProgrammes(ana.id, "2027-01-01");
 
     expect(programmes.map(({ name, university }) => ({ name, university }))).toEqual([
       { name: "MSc artificial intelligence", university: "KU Leuven" },
       { name: "MSc Robotics", university: "TU Delft" },
+    ]);
+  });
+
+  test("shows each Programme's next Deadline, soonest first", async ({ db }) => {
+    const core = setup(db);
+    const ana = await addMember(db, { name: "Ana" });
+    const add = (name: string) => core.addProgramme(ana.id, { ...erasmus, name });
+    const later = await add("MSc Later");
+    const sooner = await add("MSc Sooner");
+    const today = await add("MSc Today");
+    const passed = await add("MSc Passed");
+    await add("MSc No Deadlines");
+    await core.addDeadline(ana.id, programmeEntry(later), { label: "Final", date: "2027-03-01" });
+    await core.addDeadline(ana.id, programmeEntry(sooner), {
+      label: "Round 2",
+      date: "2027-04-01",
+    });
+    await core.addDeadline(ana.id, programmeEntry(sooner), {
+      label: "Round 1",
+      date: "2027-02-01",
+    });
+    await core.addDeadline(ana.id, programmeEntry(sooner), { label: "Early", date: "2027-01-10" });
+    await core.addDeadline(ana.id, programmeEntry(today), { label: "Final", date: "2027-01-15" });
+    await core.addDeadline(ana.id, programmeEntry(passed), { label: "Final", date: "2027-01-14" });
+
+    const programmes = await core.listProgrammes(ana.id, "2027-01-15");
+
+    expect(
+      programmes.map(({ name, nextDeadline, deadlinesPassed }) => ({
+        name,
+        nextDeadline,
+        deadlinesPassed,
+      })),
+    ).toEqual([
+      {
+        name: "MSc Today",
+        nextDeadline: { label: "Final", date: "2027-01-15" },
+        deadlinesPassed: false,
+      },
+      {
+        name: "MSc Sooner",
+        nextDeadline: { label: "Round 1", date: "2027-02-01" },
+        deadlinesPassed: false,
+      },
+      {
+        name: "MSc Later",
+        nextDeadline: { label: "Final", date: "2027-03-01" },
+        deadlinesPassed: false,
+      },
+      { name: "MSc No Deadlines", nextDeadline: null, deadlinesPassed: false },
+      { name: "MSc Passed", nextDeadline: null, deadlinesPassed: true },
     ]);
   });
 });

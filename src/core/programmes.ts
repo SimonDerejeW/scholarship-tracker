@@ -1,5 +1,5 @@
 import { asc, eq, sql } from "drizzle-orm";
-import { entryListsOf } from "./entries";
+import { bySoonestDeadline, entryListsOf } from "./entries";
 import { found, isId, optional, required, webAddress } from "./fields";
 import type { Db } from "./index";
 import { member, programme } from "./schema";
@@ -34,9 +34,12 @@ export function programmeOperations(db: Db) {
       found(rows, "Programme");
     },
 
-    /** Every Programme in the Catalog, by name. */
-    async listProgrammes(_memberId: string) {
-      return db
+    /**
+     * Every Programme in the Catalog with its next Deadline as of today (YYYY-MM-DD), soonest
+     * first, then by name.
+     */
+    async listProgrammes(_memberId: string, today: string) {
+      const rows = await db
         .select({
           id: programme.id,
           name: programme.name,
@@ -46,6 +49,7 @@ export function programmeOperations(db: Db) {
         })
         .from(programme)
         .orderBy(sql`lower(${programme.name})`, asc(programme.id));
+      return bySoonestDeadline(db, "programme", rows, today);
     },
 
     /** A Programme with its Deadlines and Requirements, or null if there is none with this id. */

@@ -1,5 +1,5 @@
 import { asc, eq, sql } from "drizzle-orm";
-import { entryListsOf } from "./entries";
+import { bySoonestDeadline, entryListsOf } from "./entries";
 import { found, isId, optional, required, webAddress } from "./fields";
 import type { Db } from "./index";
 import { member, scholarship } from "./schema";
@@ -34,9 +34,12 @@ export function scholarshipOperations(db: Db) {
       found(rows, "Scholarship");
     },
 
-    /** Every Scholarship in the Catalog, by name. */
-    async listScholarships(_memberId: string) {
-      return db
+    /**
+     * Every Scholarship in the Catalog with its next Deadline as of today (YYYY-MM-DD), soonest
+     * first, then by name.
+     */
+    async listScholarships(_memberId: string, today: string) {
+      const rows = await db
         .select({
           id: scholarship.id,
           name: scholarship.name,
@@ -45,6 +48,7 @@ export function scholarshipOperations(db: Db) {
         })
         .from(scholarship)
         .orderBy(sql`lower(${scholarship.name})`, asc(scholarship.id));
+      return bySoonestDeadline(db, "scholarship", rows, today);
     },
 
     /** A Scholarship with its Deadlines and Requirements, or null if there is none with this id. */

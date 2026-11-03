@@ -104,7 +104,7 @@ describe("Scholarship input", () => {
     await expect(core.addScholarship(ana.id, { ...daad, provider: "" })).rejects.toThrow(
       new InvalidInputError("A Scholarship needs a provider."),
     );
-    expect(await core.listScholarships(ana.id)).toEqual([]);
+    expect(await core.listScholarships(ana.id, "2027-01-01")).toEqual([]);
   });
 
   test("trims text, leaves blank optional fields empty, and only takes a web address as the link", async ({
@@ -171,9 +171,29 @@ describe("the Catalog's Scholarships", () => {
       coverage: "Tuition and living costs",
     });
 
-    expect(await core.listScholarships(bo.id)).toMatchObject([
+    expect(await core.listScholarships(bo.id, "2027-01-01")).toMatchObject([
       { name: "chevening", provider: "FCDO", coverage: "Tuition and living costs" },
       { name: "DAAD Study Scholarship", provider: "DAAD", coverage: null },
+    ]);
+  });
+
+  test("shows each Scholarship's next Deadline, soonest first", async ({ db }) => {
+    const core = setup(db);
+    const ana = await addMember(db, { name: "Ana" });
+    const daadId = await core.addScholarship(ana.id, daad);
+    const chevening = await core.addScholarship(ana.id, { name: "Chevening", provider: "FCDO" });
+    await core.addDeadline(ana.id, scholarshipEntry(daadId), {
+      label: "Final",
+      date: "2027-10-15",
+    });
+    await core.addDeadline(ana.id, scholarshipEntry(chevening), {
+      label: "Final, 12:00 GMT",
+      date: "2027-11-04",
+    });
+
+    expect(await core.listScholarships(ana.id, "2027-10-16")).toMatchObject([
+      { name: "Chevening", nextDeadline: { label: "Final, 12:00 GMT", date: "2027-11-04" } },
+      { name: "DAAD Study Scholarship", nextDeadline: null, deadlinesPassed: true },
     ]);
   });
 });

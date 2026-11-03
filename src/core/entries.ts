@@ -1,4 +1,4 @@
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, isNotNull } from "drizzle-orm";
 import { InvalidInputError } from "./errors";
 import { found, isId, optional, required } from "./fields";
 import type { Db } from "./index";
@@ -103,6 +103,44 @@ export async function entryListsOf(db: Db, entry: CatalogEntry) {
     .where(belongsTo(requirement, entry))
     .orderBy(asc(requirement.id));
   return { deadlines, requirements };
+}
+
+/**
+ * Catalog rows of one kind with each entry's next Deadline (the earliest on or after today,
+ * a YYYY-MM-DD date), soonest first; then entries with no Deadlines yet; then those whose
+ * Deadlines have all passed. Rows keep their given order within each group.
+ */
+export async function bySoonestDeadline<Row extends { id: number }>(
+  db: Db,
+  kind: CatalogEntry["kind"],
+  rows: Row[],
+  today: string,
+) {
+  const owner = deadline[KINDS[kind].owner];
+  const deadlines = await db
+    .select({ owner, label: deadline.label, date: deadline.date })
+    .from(deadline)
+    .where(isNotNull(owner))
+    .orderBy(asc(deadline.date), asc(deadline.id));
+  const next = new Map<number, { label: string; date: string }>();
+  const hasDeadlines = new Set<number>();
+  for (const { owner, label, date } of deadlines) {
+    hasDeadlines.add(owner!);
+    if (date >= today && !next.has(owner!)) {
+      next.set(owner!, { label, date });
+    }
+  }
+
+  const listed = rows.map((row) => ({
+    ...row,
+    nextDeadline: next.get(row.id) ?? null,
+    deadlinesPassed: hasDeadlines.has(row.id) && !next.has(row.id),
+  }));
+  const group = ({ nextDeadline, deadlinesPassed }: (typeof listed)[number]) =>
+    nextDeadline ? 0 : deadlinesPassed ? 2 : 1;
+  // Array sort is stable, so ties keep the rows' given order.
+  const date = (row: (typeof listed)[number]) => row.nextDeadline?.date ?? "";
+  return listed.sort((a, b) => group(a) - group(b) || date(a).localeCompare(date(b)));
 }
 
 /** Throws NotFoundError unless this Programme or Scholarship exists. */
