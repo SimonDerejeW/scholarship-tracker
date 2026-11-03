@@ -1,5 +1,6 @@
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import { applicationOperations } from "./applications";
+import { checklistOperations } from "./checklists";
 import { entryListOperations } from "./entries";
 import { programmeOperations } from "./programmes";
 import { requirementPoolOperations } from "./requirement-pool";
@@ -31,6 +32,7 @@ export function createCore({ db, adminEmail }: CoreConfig) {
     ...entryListOperations(db),
     ...requirementPoolOperations(db),
     ...applicationOperations(db),
+    ...checklistOperations(db),
 
     /** Whether this email may sign in and become a Member. */
     async canSignIn(email: string): Promise<boolean> {

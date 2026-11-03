@@ -29,6 +29,13 @@
       "when": 1793729464034,
       "tag": "0003_applications",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793730464927,
+      "tag": "0004_checklists",
+      "breakpoints": true
     }
   ]
 }

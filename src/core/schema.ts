@@ -6,6 +6,7 @@ import {
   integer,
   pgEnum,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   unique,
@@ -166,3 +167,31 @@ export const application = pgTable(
     unique("application_one_per_scholarship").on(t.memberId, t.scholarshipId),
   ],
 );
+
+// Checklists follow the Catalog live (ADR 0003): an Application's Checklist is its
+// entry's current Requirements, so only the Member's ticks on them are stored.
+// Removing a Requirement removes its ticks.
+
+/** A Member's tick on one Requirement of their Application's entry. */
+export const requirementTick = pgTable(
+  "requirement_tick",
+  {
+    applicationId: integer("application_id")
+      .notNull()
+      .references(() => application.id, { onDelete: "cascade" }),
+    requirementId: integer("requirement_id")
+      .notNull()
+      .references(() => requirement.id, { onDelete: "cascade" }),
+  },
+  (t) => [primaryKey({ columns: [t.applicationId, t.requirementId] })],
+);
+
+/** A Checklist item a Member adds to their own Application, not shared to the Catalog. */
+export const personalItem = pgTable("personal_item", {
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+  applicationId: integer("application_id")
+    .notNull()
+    .references(() => application.id, { onDelete: "cascade" }),
+  label: text("label").notNull(),
+  ticked: boolean("ticked").notNull().default(false),
+});

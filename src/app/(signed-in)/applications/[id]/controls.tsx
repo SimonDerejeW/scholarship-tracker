@@ -102,7 +102,7 @@ export function NotesForm({
 /** Deletes the Application after the Member confirms. */
 export function DeleteApplication({ action }: { action: () => Promise<void> }) {
   function confirmDelete(event: MouseEvent) {
-    if (!confirm("Delete this Application? Its Stage and notes will be lost.")) {
+    if (!confirm("Delete this Application? Its Stage, Checklist ticks, Personal items and notes will be lost.")) {
       event.preventDefault();
     }
   }

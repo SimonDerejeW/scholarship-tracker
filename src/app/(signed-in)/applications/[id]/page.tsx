@@ -4,13 +4,19 @@ import { Suspense } from "react";
 import { BackLink, Loading, PageTitle, SectionHeading } from "@/components/board";
 import { STAGES } from "@/core";
 import {
+  addPersonalItem,
   deleteApplication,
+  deletePersonalItem,
   editApplicationNotes,
+  editPersonalItem,
   setStage,
+  tickPersonalItem,
+  tickRequirement,
 } from "@/server/application-actions";
 import { core } from "@/server/core";
 import { requireMember } from "@/server/session";
 import { entryHref, KIND_NAMES } from "../../catalog/routes";
+import { Checklist } from "./checklist";
 import { DeleteApplication, NotesForm, StagePicker } from "./controls";
 
 export default function ApplicationPage({ params }: PageProps<"/applications/[id]">) {
@@ -28,7 +34,8 @@ async function Application({ params }: Pick<PageProps<"/applications/[id]">, "pa
   const member = await requireMember();
   const { id } = await params;
   const application = /^\d+$/.test(id) ? await core.getApplication(member.id, Number(id)) : null;
-  if (!application) {
+  const checklist = application && (await core.getChecklist(member.id, application.id));
+  if (!application || !checklist) {
     notFound();
   }
   const { entry } = application;
@@ -57,6 +64,18 @@ async function Application({ params }: Pick<PageProps<"/applications/[id]">, "pa
           stages={STAGES}
           stage={application.stage}
           setStage={setStage.bind(null, application.id)}
+        />
+      </section>
+
+      <section className="mt-10">
+        <Checklist
+          checklist={checklist}
+          kindName={KIND_NAMES[entry.kind]}
+          tickRequirement={tickRequirement.bind(null, application.id)}
+          tickPersonalItem={tickPersonalItem}
+          addPersonalItem={addPersonalItem.bind(null, application.id)}
+          editPersonalItem={editPersonalItem}
+          deletePersonalItem={deletePersonalItem}
         />
       </section>
 
