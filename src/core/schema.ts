@@ -1,5 +1,15 @@
 import { sql } from "drizzle-orm";
-import { boolean, check, date, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  check,
+  date,
+  integer,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+} from "drizzle-orm/pg-core";
 
 // Better Auth's tables. Its "user" model is mapped to `member` (see GLOSSARY.md).
 
@@ -117,5 +127,42 @@ export const requirement = pgTable(
   },
   (t) => [
     check("requirement_one_entry", sql`num_nonnulls(${t.programmeId}, ${t.scholarshipId}) = 1`),
+  ],
+);
+
+// Tracking: each Member's private Applications (ADR 0001).
+
+/** Where an Application stands, in the order a Member usually moves through them. */
+export const STAGES = [
+  "Interested",
+  "Preparing",
+  "Submitted",
+  "Interview",
+  "Accepted",
+  "Rejected",
+  "Withdrawn",
+] as const;
+
+export const stage = pgEnum("stage", STAGES);
+
+/** One Member's Application to exactly one Programme or Scholarship; at most one per entry. */
+export const application = pgTable(
+  "application",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    memberId: text("member_id")
+      .notNull()
+      .references(() => member.id, { onDelete: "cascade" }),
+    programmeId: integer("programme_id").references(() => programme.id),
+    scholarshipId: integer("scholarship_id").references(() => scholarship.id),
+    stage: stage("stage").notNull().default("Interested"),
+    notes: text("notes"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  },
+  (t) => [
+    check("application_one_entry", sql`num_nonnulls(${t.programmeId}, ${t.scholarshipId}) = 1`),
+    unique("application_one_per_programme").on(t.memberId, t.programmeId),
+    unique("application_one_per_scholarship").on(t.memberId, t.scholarshipId),
   ],
 );

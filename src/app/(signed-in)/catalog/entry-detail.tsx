@@ -4,7 +4,8 @@ import { BoardColumns, BoardRows, boardRow, PageTitle, SectionHeading } from "@/
 import { Button } from "@/components/ui/button";
 import type { CatalogEntry } from "@/core";
 import { DateBlock } from "./date-block";
-import { entryHref } from "./routes";
+import { entryHref, KIND_NAMES } from "./routes";
+import { Tracking } from "./tracking";
 
 type Entry = {
   name: string;
@@ -15,11 +16,10 @@ type Entry = {
   requirements: { id: number; label: string; note: string | null }[];
 };
 
-const KIND_NAMES = { programme: "Programme", scholarship: "Scholarship" };
-
 /**
  * A Programme's or Scholarship's page: its name and kind, the kind's own
- * details (children), then its link, notes, Deadlines and Requirements.
+ * details (children), whether the Member is tracking it, then its link, notes, Deadlines and
+ * Requirements.
  */
 export function EntryDetail({
   entry,
@@ -51,6 +51,7 @@ export function EntryDetail({
         </Button>
       </div>
       {children}
+      <Tracking entry={entry} />
       {data.link && (
         <p className="mt-4">
           <a

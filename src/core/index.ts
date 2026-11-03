@@ -1,11 +1,14 @@
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
+import { applicationOperations } from "./applications";
 import { entryListOperations } from "./entries";
 import { programmeOperations } from "./programmes";
 import { requirementPoolOperations } from "./requirement-pool";
 import { scholarshipOperations } from "./scholarships";
 import type * as schema from "./schema";
 
+export type { Stage } from "./applications";
 export type { CatalogEntry } from "./entries";
+export { STAGES } from "./schema";
 export { InvalidInputError, NotFoundError } from "./errors";
 
 // The core module: every rule lives here, and it is the only code that talks to
@@ -27,6 +30,7 @@ export function createCore({ db, adminEmail }: CoreConfig) {
     ...scholarshipOperations(db),
     ...entryListOperations(db),
     ...requirementPoolOperations(db),
+    ...applicationOperations(db),
 
     /** Whether this email may sign in and become a Member. */
     async canSignIn(email: string): Promise<boolean> {

@@ -4,3 +4,6 @@ import type { CatalogEntry } from "@/core";
 export function entryHref({ kind, id }: CatalogEntry) {
   return `/catalog/${kind === "programme" ? "programmes" : "scholarships"}/${id}`;
 }
+
+/** What each kind of entry is called on screen. */
+export const KIND_NAMES = { programme: "Programme", scholarship: "Scholarship" } as const;

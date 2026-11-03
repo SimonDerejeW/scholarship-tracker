@@ -10,7 +10,7 @@ import { deadline, programme, requirement, scholarship } from "./schema";
 export type CatalogEntry = { kind: keyof typeof KINDS; id: number };
 
 /** Each kind of entry: its table, its name, and the column pointing a Deadline or Requirement at it. */
-const KINDS = {
+export const KINDS = {
   programme: { table: programme, name: "Programme", owner: "programmeId" },
   scholarship: { table: scholarship, name: "Scholarship", owner: "scholarshipId" },
 } as const;
@@ -157,8 +157,8 @@ export function belongsTo(table: typeof deadline | typeof requirement, entry: Ca
   return eq(table[KINDS[entry.kind].owner], entry.id);
 }
 
-/** The column values that make a new Deadline or Requirement belong to this entry. */
-function owner(entry: CatalogEntry) {
+/** The column values that point a new Deadline, Requirement or Application at this entry. */
+export function owner(entry: CatalogEntry) {
   return { [KINDS[entry.kind].owner]: entry.id };
 }
 

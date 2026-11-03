@@ -16,7 +16,11 @@ export function CurrentNavLinks() {
 /** The main navigation; with no pathname, nothing is marked current. */
 export function NavLinks({ pathname }: { pathname?: string }) {
   return LINKS.map(({ href, label }) => {
-    const current = href === "/" ? pathname === "/" : pathname?.startsWith(href);
+    // Applications live under Upcoming.
+    const current =
+      href === "/"
+        ? pathname === "/" || pathname?.startsWith("/applications/")
+        : pathname?.startsWith(href);
     return (
       <Link
         key={href}

@@ -22,6 +22,13 @@
       "when": 1793720460361,
       "tag": "0002_catalog_scholarships",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793729464034,
+      "tag": "0003_applications",
+      "breakpoints": true
     }
   ]
 }
