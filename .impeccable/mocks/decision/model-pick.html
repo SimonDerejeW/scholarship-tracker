@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Upcoming · The Departures Board (synthetic data)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --board:#0E1116; --row:#161A21; --amber:#F4C430; --white:#F2F2F2; --green:#3BB273; --red:#E5484D; --mute:#8B93A1; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { width:390px; height:844px; overflow:hidden; }
+  body { background:var(--board); color:var(--white); font-family:"Barlow Condensed", system-ui, sans-serif; font-variant-numeric:tabular-nums; }
+  header { padding:14px 16px 0; border-bottom:1px solid #262B34; }
+  .top { display:flex; justify-content:space-between; align-items:center; }
+  .name { font-size:18px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; }
+  .me { width:28px; height:28px; border-radius:50%; background:#262B34; display:grid; place-items:center; font-size:14px; }
+  nav { display:flex; gap:22px; margin-top:10px; font-size:17px; letter-spacing:.04em; text-transform:uppercase; }
+  nav a { color:var(--mute); text-decoration:none; padding-bottom:9px; border-bottom:3px solid transparent; }
+  nav a.on { color:var(--amber); border-color:var(--amber); }
+  .head { display:flex; justify-content:space-between; align-items:flex-end; padding:18px 16px 10px; }
+  h1 { font-size:34px; font-weight:700; letter-spacing:.02em; text-transform:uppercase; line-height:1; }
+  .today { color:var(--mute); font-size:15px; margin-top:4px; letter-spacing:.03em; }
+  select { font:inherit; font-size:15px; background:#161A21; color:var(--white); border:1px solid #2E3440; padding:6px 10px; border-radius:4px; }
+  .cols { display:grid; grid-template-columns:62px 1fr 78px; gap:10px; padding:6px 16px; font-size:13px; letter-spacing:.1em; color:var(--mute); text-transform:uppercase; border-bottom:1px solid #262B34; }
+  ul { list-style:none; }
+  li { display:grid; grid-template-columns:62px 1fr 78px; gap:10px; align-items:center; padding:11px 16px; border-bottom:1px solid #1E232B; }
+  li:nth-child(odd) { background:var(--row); }
+  .date { font-size:22px; font-weight:600; line-height:1; color:var(--amber); }
+  .date small { display:block; font-size:13px; color:var(--mute); margin-top:3px; letter-spacing:.06em; }
+  .t { font-size:19px; font-weight:600; line-height:1.15; text-transform:uppercase; letter-spacing:.01em; }
+  .s { font-size:14px; color:var(--mute); margin-top:3px; letter-spacing:.03em; }
+  .st { font-weight:600; letter-spacing:.06em; text-transform:uppercase; }
+  .go { color:var(--green); }
+  .warn { color:var(--amber); }
+  .flaps { display:flex; gap:3px; justify-content:flex-end; }
+  .flap { position:relative; width:22px; height:32px; background:#05070A; border-radius:3px; display:grid; place-items:center; font-size:24px; font-weight:700; color:var(--amber); }
+  .flap::after { content:""; position:absolute; left:0; right:0; top:50%; border-top:1px solid #000; }
+  .lbl { display:block; text-align:right; font-size:12px; color:var(--mute); margin-top:3px; letter-spacing:.08em; }
+  .closed .date, .closed .t { color:#8B93A1; }
+  .closed .st { color:var(--red); }
+  .gate { font-size:15px; font-weight:700; color:var(--red); text-align:right; letter-spacing:.06em; line-height:1.1; }
+</style>
+</head>
+<body>
+  <header>
+    <div class="top"><span class="name">Scholarship Tracker</span><span class="me">S</span></div>
+    <nav><a class="on" href="#">Upcoming</a><a href="#">Catalog</a></nav>
+  </header>
+  <div class="head">
+    <div><h1>Upcoming</h1><p class="today">TUE 3 NOV · ADDIS ABABA</p></div>
+    <select aria-label="Stage"><option>OPEN STAGES</option></select>
+  </div>
+  <div class="cols"><span>Date</span><span>Application</span><span style="text-align:right">Days</span></div>
+  <ul>
+    <li>
+      <span class="date">10 NOV<small>TUE</small></span>
+      <div><p class="t">Chevening Scholarship</p><p class="s"><span class="st go">Preparing</span> · 5/8 · Application closes</p></div>
+      <div><div class="flaps"><span class="flap">0</span><span class="flap">7</span></div><span class="lbl">DAYS</span></div>
+    </li>
+    <li>
+      <span class="date">19 NOV<small>THU</small></span>
+      <div><p class="t">Copernicus Master in Digital Earth</p><p class="s"><span class="st warn">Interested · boarding soon</span> · 0/7</p></div>
+      <div><div class="flaps"><span class="flap">1</span><span class="flap">6</span></div><span class="lbl">DAYS</span></div>
+    </li>
+    <li>
+      <span class="date">1 DEC<small>TUE</small></span>
+      <div><p class="t">MSc Water Management, IHE Delft</p><p class="s"><span class="st go">Preparing</span> · 3/9 · Final</p></div>
+      <div><div class="flaps"><span class="flap">2</span><span class="flap">8</span></div><span class="lbl">DAYS</span></div>
+    </li>
+    <li>
+      <span class="date">15 DEC<small>TUE</small></span>
+      <div><p class="t">DAAD EPOS Scholarship</p><p class="s"><span class="st">Interested</span> · 1/10 · Programme deadline</p></div>
+      <div><div class="flaps"><span class="flap">4</span><span class="flap">2</span></div><span class="lbl">DAYS</span></div>
+    </li>
+    <li>
+      <span class="date">15 JAN<small>FRI</small></span>
+      <div><p class="t">MSc Development Studies, ISS</p><p class="s"><span class="st go">Submitted</span> · 9/9 · Round 1</p></div>
+      <div><div class="flaps"><span class="flap">7</span><span class="flap">3</span></div><span class="lbl">DAYS</span></div>
+    </li>
+    <li class="closed">
+      <span class="date">28 OCT<small>WED</small></span>
+      <div><p class="t">MSc Public Health, LSHTM</p><p class="s"><span class="st">Interested</span> · 1/8 · Final</p></div>
+      <p class="gate">GATE<br>CLOSED</p>
+    </li>
+    <li>
+      <span class="date">TBA<small>&nbsp;</small></span>
+      <div><p class="t">Erasmus Mundus Global Health</p><p class="s"><span class="st">Interested</span> · 0/6 · Deadline TBA</p></div>
+      <div><div class="flaps"><span class="flap">–</span><span class="flap">–</span></div><span class="lbl">DAYS</span></div>
+    </li>
+  </ul>
+</body>
+</html>

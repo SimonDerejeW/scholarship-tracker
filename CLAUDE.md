@@ -1,5 +1,13 @@
 # scholarship-tracker
 
+## UI
+
+All UI follows `DESIGN.md`: The Departures Board, dark only. Until #13 writes `DESIGN.md`, follow the brief on issue #13. Product context is in `PRODUCT.md`.
+
+- Components come from shadcn (MCP in `.mcp.json`), restyled to the design tokens. Never ship the stock shadcn look or hard-coded colours.
+- UI copy uses `GLOSSARY.md` terms; the board metaphor is visual only.
+- For substantial UI work, use the `/impeccable` skill.
+
 ## Agent skills
 
 ### Issue tracker

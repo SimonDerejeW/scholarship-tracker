@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "files": [
+          ".impeccable/mocks/decision/canon.html"
+        ],
+        "createdAt": "2026-11-03T14:41:52.220Z",
+        "reason": "Claude decided: canon.html is the decision round's category-standard card, which deliberately renders the generic default; not shipped UI"
+      }
+    ]
+  }
+}

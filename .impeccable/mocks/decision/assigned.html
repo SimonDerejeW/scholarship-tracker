@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Upcoming · The Wall Calendar (synthetic data)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Noto+Sans+Ethiopic:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --paper:#FDFDFB; --ink:#121212; --red:#D2232A; --band:#0B5B3E; --rule:#D9D9D4; --mute:#6A6A66; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { width:390px; height:844px; overflow:hidden; }
+  body { background:var(--paper); color:var(--ink); font-family:Archivo, system-ui, sans-serif; font-variant-numeric:tabular-nums; }
+  .band { background:var(--band); color:#fff; padding:14px 16px 0; }
+  .band-top { display:flex; justify-content:space-between; align-items:center; }
+  .name { font-weight:700; font-size:16px; letter-spacing:-0.01em; }
+  .me { width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,.16); display:grid; place-items:center; font-size:13px; font-weight:600; }
+  nav { display:flex; gap:22px; margin-top:12px; font-size:15px; }
+  nav a { color:rgba(255,255,255,.7); text-decoration:none; padding-bottom:10px; border-bottom:3px solid transparent; }
+  nav a.on { color:#fff; font-weight:600; border-color:#fff; }
+  .head { display:flex; justify-content:space-between; align-items:flex-end; padding:18px 16px 12px; }
+  h1 { font-size:28px; font-weight:800; font-stretch:80%; letter-spacing:-0.01em; line-height:1; }
+  .today { font-size:13px; color:var(--mute); margin-top:6px; }
+  select { font:inherit; font-size:14px; border:1px solid var(--rule); background:#fff; padding:7px 10px; border-radius:6px; color:var(--ink); }
+  .strip { margin:0 16px; border-top:2px solid var(--ink); border-bottom:1px solid var(--rule); padding:6px 0 8px; }
+  .wk, .days { display:grid; grid-template-columns:repeat(7,1fr); text-align:center; }
+  .wk span { font-size:11px; font-weight:600; color:var(--mute); padding-bottom:4px; }
+  .wk span:last-child, .days .sun { color:var(--red); }
+  .days span { position:relative; font-size:17px; font-weight:600; font-stretch:75%; height:32px; line-height:32px; }
+  .days .past { color:#6E6E6A; }
+  .days .past::after { content:""; position:absolute; left:28%; right:28%; top:50%; border-top:1.5px solid #8A8A86; transform:rotate(-28deg); }
+  .days .now { outline:2px solid var(--ink); outline-offset:-3px; }
+  .days .dl { font-weight:900; }
+  .days .dl::before { content:""; position:absolute; left:50%; bottom:3px; width:4px; height:4px; margin-left:-2px; border-radius:50%; background:var(--ink); }
+  .days .hot { color:var(--red); }
+  .days .hot::after { content:""; position:absolute; left:50%; top:50%; width:30px; height:30px; margin:-15px 0 0 -15px; border:2px solid var(--red); border-radius:50%; }
+  ul { list-style:none; }
+  li { display:grid; grid-template-columns:58px 1fr auto; gap:12px; align-items:center; padding:11px 16px; border-bottom:1px solid var(--rule); }
+  .cell { text-align:center; position:relative; }
+  .d { display:block; font-size:30px; font-weight:800; font-stretch:72%; line-height:1; }
+  .m { display:block; font-size:11px; font-weight:600; letter-spacing:.06em; margin-top:2px; }
+  .et { display:block; font-family:"Noto Sans Ethiopic", sans-serif; font-size:11px; color:var(--mute); margin-top:1px; }
+  .hot .d { color:var(--red); }
+  .hot .d::after { content:""; position:absolute; left:50%; top:-5px; width:44px; height:44px; margin-left:-22px; border:2px solid var(--red); border-radius:50%; }
+  .missed .d { color:#6E6E6A; }
+  .missed .cell::after { content:""; position:absolute; left:6px; right:6px; top:15px; border-top:2px solid var(--red); transform:rotate(-24deg); }
+  .t { font-size:15px; font-weight:650; line-height:1.25; }
+  .s { font-size:13px; color:var(--mute); margin-top:2px; }
+  .s b { color:var(--ink); font-weight:600; }
+  .left { text-align:right; }
+  .n { font-size:22px; font-weight:800; font-stretch:75%; line-height:1; }
+  .u { display:block; font-size:11px; color:var(--mute); margin-top:2px; }
+  .hot .n, .missed .n { color:var(--red); }
+  .sec { padding:14px 16px 4px; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--mute); border-bottom:1px solid var(--rule); }
+  .tba .d { font-size:18px; color:var(--mute); }
+</style>
+</head>
+<body>
+  <header class="band">
+    <div class="band-top"><span class="name">Scholarship Tracker</span><span class="me">S</span></div>
+    <nav><a class="on" href="#">Upcoming</a><a href="#">Catalog</a></nav>
+  </header>
+
+  <div class="head">
+    <div><h1>Upcoming</h1><p class="today">Tuesday 3 November</p></div>
+    <select aria-label="Stage"><option>Open Stages</option></select>
+  </div>
+
+  <div class="strip" aria-label="Next three weeks">
+    <div class="wk"><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span><span>S</span></div>
+    <div class="days">
+      <span class="past">2</span><span class="now">3</span><span>4</span><span>5</span><span>6</span><span>7</span><span class="sun">8</span>
+      <span>9</span><span class="dl">10</span><span>11</span><span>12</span><span>13</span><span>14</span><span class="sun">15</span>
+      <span>16</span><span>17</span><span>18</span><span class="dl hot">19</span><span>20</span><span>21</span><span class="sun">22</span>
+    </div>
+  </div>
+
+  <ul>
+    <li>
+      <div class="cell"><span class="d">10</span><span class="m">NOV · TUE</span><span class="et">ኅዳር 1</span></div>
+      <div><p class="t">Chevening Scholarship</p><p class="s">Application closes, 12:00 GMT</p><p class="s"><b>Preparing</b> · 5/8</p></div>
+      <div class="left"><span class="n">7</span><span class="u">days</span></div>
+    </li>
+    <li class="hot">
+      <div class="cell"><span class="d">19</span><span class="m">NOV · THU</span><span class="et">ኅዳር 10</span></div>
+      <div><p class="t">Copernicus Master in Digital Earth</p><p class="s">Scholarship priority</p><p class="s"><b>Interested</b> · 0/7</p></div>
+      <div class="left"><span class="n">16</span><span class="u">days</span></div>
+    </li>
+    <li>
+      <div class="cell"><span class="d">1</span><span class="m">DEC · TUE</span><span class="et">ኅዳር 22</span></div>
+      <div><p class="t">MSc Water Management, IHE Delft</p><p class="s">Final</p><p class="s"><b>Preparing</b> · 3/9</p></div>
+      <div class="left"><span class="n">28</span><span class="u">days</span></div>
+    </li>
+    <li>
+      <div class="cell"><span class="d">15</span><span class="m">DEC · TUE</span><span class="et">ታኅሣሥ 6</span></div>
+      <div><p class="t">DAAD EPOS Scholarship</p><p class="s">Programme deadline</p><p class="s"><b>Interested</b> · 1/10</p></div>
+      <div class="left"><span class="n">42</span><span class="u">days</span></div>
+    </li>
+    <li>
+      <div class="cell"><span class="d">15</span><span class="m">JAN · FRI</span><span class="et">ጥር 7</span></div>
+      <div><p class="t">MSc Development Studies, ISS</p><p class="s">Round 1</p><p class="s"><b>Submitted</b> · 9/9</p></div>
+      <div class="left"><span class="n">73</span><span class="u">days</span></div>
+    </li>
+  </ul>
+  <p class="sec">Deadlines passed</p>
+  <ul>
+    <li class="missed">
+      <div class="cell"><span class="d">28</span><span class="m">OCT · WED</span><span class="et">ጥቅምት 18</span></div>
+      <div><p class="t">MSc Public Health, LSHTM</p><p class="s">Final</p><p class="s"><b>Interested</b> · 1/8</p></div>
+      <div class="left"><span class="n" style="font-size:15px">Missed</span></div>
+    </li>
+  </ul>
+</body>
+</html>
