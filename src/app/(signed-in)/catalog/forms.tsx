@@ -76,6 +76,82 @@ export function ProgrammeForm({
   );
 }
 
+type ScholarshipValues = {
+  name: string;
+  provider: string;
+  link: string | null;
+  coverage: string | null;
+  notes: string | null;
+};
+
+export function ScholarshipForm({
+  action,
+  scholarship,
+  submitLabel,
+}: {
+  action: FormAction;
+  scholarship?: ScholarshipValues;
+  submitLabel: string;
+}) {
+  const [state, formAction, pending] = useActionState(action, {});
+  const values = state.values ?? {
+    name: scholarship?.name ?? "",
+    provider: scholarship?.provider ?? "",
+    link: scholarship?.link ?? "",
+    coverage: scholarship?.coverage ?? "",
+    notes: scholarship?.notes ?? "",
+  };
+
+  return (
+    <form action={formAction} className="mt-8 flex max-w-form flex-col gap-6">
+      <Field label="Name" hint="e.g. DAAD Study Scholarship">
+        {(id, hintId) => (
+          <Input
+            id={id}
+            aria-describedby={hintId}
+            name="name"
+            required
+            defaultValue={values.name}
+          />
+        )}
+      </Field>
+      <Field label="Provider" hint="Who awards it, e.g. DAAD">
+        {(id, hintId) => (
+          <Input
+            id={id}
+            aria-describedby={hintId}
+            name="provider"
+            required
+            defaultValue={values.provider}
+          />
+        )}
+      </Field>
+      <Field label="Link" optional>
+        {(id) => (
+          <Input id={id} name="link" type="url" placeholder="https://" defaultValue={values.link} />
+        )}
+      </Field>
+      <Field label="What it covers" optional hint="e.g. Tuition, €992 a month, travel">
+        {(id, hintId) => (
+          <Input
+            id={id}
+            aria-describedby={hintId}
+            name="coverage"
+            defaultValue={values.coverage}
+          />
+        )}
+      </Field>
+      <Field label="Notes" optional>
+        {(id) => <Textarea id={id} name="notes" rows={4} defaultValue={values.notes} />}
+      </Field>
+      <FormError error={state.error} />
+      <Button type="submit" disabled={pending} className="self-start">
+        {submitLabel}
+      </Button>
+    </form>
+  );
+}
+
 function FundingIncludedField({ defaultChecked }: { defaultChecked: boolean }) {
   const id = useId();
   return (

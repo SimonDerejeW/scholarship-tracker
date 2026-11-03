@@ -2,7 +2,7 @@ import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
 import { migrate } from "drizzle-orm/pglite/migrator";
 import { test as base } from "vitest";
-import type { Db } from "@/core";
+import type { CatalogEntry, Db } from "@/core";
 import * as schema from "@/core/schema";
 
 // One migrated in-memory Postgres per test file; each test gets a fresh clone of it.
@@ -29,4 +29,13 @@ export async function addMember(db: Db, { name }: { name: string }) {
   const email = `${id}@example.com`;
   await db.insert(schema.member).values({ id, name, email });
   return { id, name, email };
+}
+
+/** The Catalog entry argument for a Programme's or Scholarship's Deadlines and Requirements. */
+export function programmeEntry(id: number): CatalogEntry {
+  return { kind: "programme", id };
+}
+
+export function scholarshipEntry(id: number): CatalogEntry {
+  return { kind: "scholarship", id };
 }

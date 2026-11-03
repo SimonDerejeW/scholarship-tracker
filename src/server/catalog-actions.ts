@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { InvalidInputError, NotFoundError } from "@/core";
+import { InvalidInputError, NotFoundError, type CatalogEntry } from "@/core";
 import { core } from "./core";
 import { requireMember } from "./session";
 
@@ -36,15 +36,40 @@ export async function editProgramme(
   redirect(`/catalog/programmes/${id}`);
 }
 
-export async function addDeadline(
-  programmeId: number,
+export async function addScholarship(_state: FormState, formData: FormData): Promise<FormState> {
+  const member = await requireMember();
+  let id = 0;
+  const state = await mutate(formData, async () => {
+    id = await core.addScholarship(member.id, scholarshipInput(formData));
+  });
+  if (state.error) {
+    return state;
+  }
+  redirect(`/catalog/scholarships/${id}`);
+}
+
+export async function editScholarship(
+  id: number,
   _state: FormState,
   formData: FormData,
 ): Promise<FormState> {
   const member = await requireMember();
-  return mutate(formData, () =>
-    core.addDeadline(member.id, programmeId, deadlineInput(formData)),
+  const state = await mutate(formData, () =>
+    core.editScholarship(member.id, id, scholarshipInput(formData)),
   );
+  if (state.error) {
+    return state;
+  }
+  redirect(`/catalog/scholarships/${id}`);
+}
+
+export async function addDeadline(
+  entry: CatalogEntry,
+  _state: FormState,
+  formData: FormData,
+): Promise<FormState> {
+  const member = await requireMember();
+  return mutate(formData, () => core.addDeadline(member.id, entry, deadlineInput(formData)));
 }
 
 export async function editDeadline(
@@ -63,13 +88,13 @@ export async function removeDeadline(id: number): Promise<void> {
 }
 
 export async function addRequirement(
-  programmeId: number,
+  entry: CatalogEntry,
   _state: FormState,
   formData: FormData,
 ): Promise<FormState> {
   const member = await requireMember();
   return mutate(formData, () =>
-    core.addRequirement(member.id, programmeId, requirementInput(formData)),
+    core.addRequirement(member.id, entry, requirementInput(formData)),
   );
 }
 
@@ -110,6 +135,16 @@ function programmeInput(formData: FormData) {
     country: text(formData, "country"),
     link: text(formData, "link"),
     fundingIncluded: formData.get("fundingIncluded") === "on",
+    notes: text(formData, "notes"),
+  };
+}
+
+function scholarshipInput(formData: FormData) {
+  return {
+    name: text(formData, "name"),
+    provider: text(formData, "provider"),
+    link: text(formData, "link"),
+    coverage: text(formData, "coverage"),
     notes: text(formData, "notes"),
   };
 }

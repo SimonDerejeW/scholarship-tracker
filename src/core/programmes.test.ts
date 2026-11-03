@@ -1,6 +1,6 @@
 import { describe, expect } from "vitest";
 import { createCore, InvalidInputError, NotFoundError, type Db } from "@/core";
-import { addMember, test } from "@/core/testing/harness";
+import { addMember, programmeEntry, test } from "@/core/testing/harness";
 
 function setup(db: Db) {
   return createCore({ db, adminEmail: "admin@example.com" });
@@ -47,8 +47,14 @@ describe("Deadlines", () => {
     const ana = await addMember(db, { name: "Ana" });
     const id = await core.addProgramme(ana.id, erasmus);
 
-    await core.addDeadline(ana.id, id, { label: "Final, 12:00 CET", date: "2027-03-01" });
-    await core.addDeadline(ana.id, id, { label: "Scholarship priority", date: "2027-01-15" });
+    await core.addDeadline(ana.id, programmeEntry(id), {
+      label: "Final, 12:00 CET",
+      date: "2027-03-01",
+    });
+    await core.addDeadline(ana.id, programmeEntry(id), {
+      label: "Scholarship priority",
+      date: "2027-01-15",
+    });
 
     const { deadlines } = (await core.getProgramme(ana.id, id))!;
     expect(deadlines.map(({ label, date }) => ({ label, date }))).toEqual([
@@ -62,8 +68,11 @@ describe("Deadlines", () => {
     const ana = await addMember(db, { name: "Ana" });
     const bo = await addMember(db, { name: "Bo" });
     const id = await core.addProgramme(ana.id, erasmus);
-    const first = await core.addDeadline(ana.id, id, { label: "Round 1", date: "2027-01-15" });
-    await core.addDeadline(ana.id, id, { label: "Round 2", date: "2027-02-15" });
+    const first = await core.addDeadline(ana.id, programmeEntry(id), {
+      label: "Round 1",
+      date: "2027-01-15",
+    });
+    await core.addDeadline(ana.id, programmeEntry(id), { label: "Round 2", date: "2027-02-15" });
 
     await core.editDeadline(bo.id, first, { label: "Round 1 (extended)", date: "2027-03-01" });
 
@@ -79,8 +88,11 @@ describe("Deadlines", () => {
     const ana = await addMember(db, { name: "Ana" });
     const bo = await addMember(db, { name: "Bo" });
     const id = await core.addProgramme(ana.id, erasmus);
-    const cancelled = await core.addDeadline(ana.id, id, { label: "Round 1", date: "2027-01-15" });
-    await core.addDeadline(ana.id, id, { label: "Round 2", date: "2027-02-15" });
+    const cancelled = await core.addDeadline(ana.id, programmeEntry(id), {
+      label: "Round 1",
+      date: "2027-01-15",
+    });
+    await core.addDeadline(ana.id, programmeEntry(id), { label: "Round 2", date: "2027-02-15" });
 
     await core.removeDeadline(bo.id, cancelled);
 
@@ -96,8 +108,8 @@ describe("another Member's Programme", () => {
     const bo = await addMember(db, { name: "Bo" });
     const id = await core.addProgramme(ana.id, erasmus);
 
-    await core.addDeadline(bo.id, id, { label: "Final", date: "2027-01-15" });
-    await core.addRequirement(bo.id, id, { label: "CV" });
+    await core.addDeadline(bo.id, programmeEntry(id), { label: "Final", date: "2027-01-15" });
+    await core.addRequirement(bo.id, programmeEntry(id), { label: "CV" });
 
     expect(await core.getProgramme(ana.id, id)).toMatchObject({
       deadlines: [{ label: "Final", date: "2027-01-15" }],
@@ -112,9 +124,9 @@ describe("Deadline input", () => {
     const ana = await addMember(db, { name: "Ana" });
     const id = await core.addProgramme(ana.id, erasmus);
 
-    await expect(core.addDeadline(ana.id, id, { label: " ", date: "2027-01-15" })).rejects.toThrow(
-      new InvalidInputError("A Deadline needs a label."),
-    );
+    await expect(
+      core.addDeadline(ana.id, programmeEntry(id), { label: " ", date: "2027-01-15" }),
+    ).rejects.toThrow(new InvalidInputError("A Deadline needs a label."));
   });
 
   test("needs a real calendar date", async ({ db }) => {
@@ -123,11 +135,11 @@ describe("Deadline input", () => {
     const id = await core.addProgramme(ana.id, erasmus);
 
     for (const date of ["", "2027-02-30", "15/01/2027", "2027-01-15T12:00"]) {
-      await expect(core.addDeadline(ana.id, id, { label: "Final", date })).rejects.toThrow(
-        new InvalidInputError("A Deadline needs a date."),
-      );
+      await expect(
+        core.addDeadline(ana.id, programmeEntry(id), { label: "Final", date }),
+      ).rejects.toThrow(new InvalidInputError("A Deadline needs a date."));
     }
-    await core.addDeadline(ana.id, id, { label: "Final", date: "2028-02-29" });
+    await core.addDeadline(ana.id, programmeEntry(id), { label: "Final", date: "2028-02-29" });
     expect((await core.getProgramme(ana.id, id))?.deadlines).toMatchObject([
       { label: "Final", date: "2028-02-29" },
     ]);
@@ -140,9 +152,12 @@ describe("Requirements", () => {
     const ana = await addMember(db, { name: "Ana" });
     const id = await core.addProgramme(ana.id, erasmus);
 
-    await core.addRequirement(ana.id, id, { label: "CV" });
-    await core.addRequirement(ana.id, id, { label: "Reference letters", note: "Two, academic" });
-    await core.addRequirement(ana.id, id, { label: "IELTS", note: "≥ 6.5" });
+    await core.addRequirement(ana.id, programmeEntry(id), { label: "CV" });
+    await core.addRequirement(ana.id, programmeEntry(id), {
+      label: "Reference letters",
+      note: "Two, academic",
+    });
+    await core.addRequirement(ana.id, programmeEntry(id), { label: "IELTS", note: "≥ 6.5" });
 
     const { requirements } = (await core.getProgramme(ana.id, id))!;
     expect(requirements.map(({ label, note }) => ({ label, note }))).toEqual([
@@ -157,7 +172,10 @@ describe("Requirements", () => {
     const ana = await addMember(db, { name: "Ana" });
     const bo = await addMember(db, { name: "Bo" });
     const id = await core.addProgramme(ana.id, erasmus);
-    const ielts = await core.addRequirement(ana.id, id, { label: "IELTS", note: "≥ 6.5" });
+    const ielts = await core.addRequirement(ana.id, programmeEntry(id), {
+      label: "IELTS",
+      note: "≥ 6.5",
+    });
 
     await core.editRequirement(bo.id, ielts, { label: "IELTS or TOEFL", note: null });
 
@@ -172,8 +190,8 @@ describe("Requirements", () => {
     const ana = await addMember(db, { name: "Ana" });
     const bo = await addMember(db, { name: "Bo" });
     const id = await core.addProgramme(ana.id, erasmus);
-    await core.addRequirement(ana.id, id, { label: "CV" });
-    const portfolio = await core.addRequirement(ana.id, id, { label: "Portfolio" });
+    await core.addRequirement(ana.id, programmeEntry(id), { label: "CV" });
+    const portfolio = await core.addRequirement(ana.id, programmeEntry(id), { label: "Portfolio" });
 
     await core.removeRequirement(bo.id, portfolio);
 
@@ -186,10 +204,10 @@ describe("Requirements", () => {
     const ana = await addMember(db, { name: "Ana" });
     const id = await core.addProgramme(ana.id, erasmus);
 
-    await expect(core.addRequirement(ana.id, id, { label: "", note: "Two" })).rejects.toThrow(
-      new InvalidInputError("A Requirement needs a label."),
-    );
-    await core.addRequirement(ana.id, id, { label: " CV ", note: "  " });
+    await expect(
+      core.addRequirement(ana.id, programmeEntry(id), { label: "", note: "Two" }),
+    ).rejects.toThrow(new InvalidInputError("A Requirement needs a label."));
+    await core.addRequirement(ana.id, programmeEntry(id), { label: " CV ", note: "  " });
 
     expect((await core.getProgramme(ana.id, id))?.requirements).toMatchObject([
       { label: "CV", note: null },
@@ -279,7 +297,11 @@ describe("the Catalog", () => {
     const ana = await addMember(db, { name: "Ana" });
     const bo = await addMember(db, { name: "Bo" });
     await core.addProgramme(ana.id, { ...erasmus, name: "MSc Robotics", university: "TU Delft" });
-    await core.addProgramme(bo.id, { ...erasmus, name: "MSc artificial intelligence", university: "KU Leuven" });
+    await core.addProgramme(bo.id, {
+      ...erasmus,
+      name: "MSc artificial intelligence",
+      university: "KU Leuven",
+    });
 
     const programmes = await core.listProgrammes(ana.id);
 
@@ -299,17 +321,22 @@ describe("something that doesn't exist", () => {
     expect(await core.getProgramme(ana.id, 2 ** 31)).toBeNull();
     await expect(core.editProgramme(ana.id, 404, erasmus)).rejects.toThrow(NotFoundError);
     await expect(
-      core.addDeadline(ana.id, 404, { label: "Final", date: "2027-01-15" }),
+      core.addDeadline(ana.id, programmeEntry(404), { label: "Final", date: "2027-01-15" }),
     ).rejects.toThrow(NotFoundError);
-    await expect(core.addRequirement(ana.id, 404, { label: "CV" })).rejects.toThrow(NotFoundError);
+    await expect(core.addRequirement(ana.id, programmeEntry(404), { label: "CV" })).rejects.toThrow(
+      NotFoundError,
+    );
   });
 
   test("a removed Deadline or Requirement can't be edited", async ({ db }) => {
     const core = setup(db);
     const ana = await addMember(db, { name: "Ana" });
     const id = await core.addProgramme(ana.id, erasmus);
-    const final = await core.addDeadline(ana.id, id, { label: "Final", date: "2027-01-15" });
-    const cv = await core.addRequirement(ana.id, id, { label: "CV" });
+    const final = await core.addDeadline(ana.id, programmeEntry(id), {
+      label: "Final",
+      date: "2027-01-15",
+    });
+    const cv = await core.addRequirement(ana.id, programmeEntry(id), { label: "CV" });
     await core.removeDeadline(ana.id, final);
     await core.removeRequirement(ana.id, cv);
 

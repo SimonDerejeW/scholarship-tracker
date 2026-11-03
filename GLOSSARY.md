@@ -25,7 +25,7 @@ One thing a Programme or Scholarship asks applicants to provide (e.g. CV, two re
 _Avoid_: Document, prerequisite
 
 **Requirement pool**:
-The common Requirements offered when adding one to a Programme: every Requirement already in the Catalog, most used first, then a built-in starter list. Picking one copies its label and usual note to be adjusted; the copy is not linked to where it came from.
+The common Requirements offered when adding one to a Programme or Scholarship: every Requirement already in the Catalog, most used first, then a built-in starter list. Picking one copies its label and usual note to be adjusted; the copy is not linked to where it came from.
 _Avoid_: Template, library, preset
 
 ## Tracking

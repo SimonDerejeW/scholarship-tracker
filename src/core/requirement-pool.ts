@@ -1,10 +1,11 @@
 import { asc } from "drizzle-orm";
+import { belongsTo, requireEntry, type CatalogEntry } from "./entries";
 import type { Db } from "./index";
-import { requireProgramme } from "./programmes";
 import { requirement } from "./schema";
 
 // The Requirement pool: common Requirements offered when adding one to a
-// Programme. Picking one copies it; it stays unlinked from where it came from.
+// Programme or Scholarship. Picking one copies it; it stays unlinked from where
+// it came from.
 
 export type SuggestedRequirement = { label: string; note: string | null };
 
@@ -24,40 +25,40 @@ type PoolEntry = { count: number; spellings: Map<string, number>; notes: Map<str
 export function requirementPoolOperations(db: Db) {
   return {
     /**
-     * Requirements worth adding to this Programme: those already in the Catalog,
+     * Requirements worth adding to this Programme or Scholarship: those already in the Catalog,
      * most used first, then the rest of a starter list of common ones. Each
      * carries the note most often given with it.
      */
     async suggestRequirements(
       _memberId: string,
-      programmeId: number,
+      entry: CatalogEntry,
     ): Promise<SuggestedRequirement[]> {
-      await requireProgramme(db, programmeId);
+      await requireEntry(db, entry);
       const inCatalog = await db
         .select({
           label: requirement.label,
           note: requirement.note,
-          programmeId: requirement.programmeId,
+          isOwn: belongsTo(requirement, entry).mapWith(Boolean),
         })
         .from(requirement)
         .orderBy(asc(requirement.id));
 
       // Labels that differ only in case or spacing are the same Requirement,
-      // spelt the way most Programmes spell it.
+      // spelt the way most entries spell it.
       const pool = new Map<string, PoolEntry>();
       const alreadyHas = new Set<string>();
-      for (const { label, note, programmeId: owner } of inCatalog) {
+      for (const { label, note, isOwn } of inCatalog) {
         const key = poolKey(label);
-        if (owner === programmeId) {
+        if (isOwn) {
           alreadyHas.add(key);
         }
-        const entry = pool.get(key) ?? { count: 0, spellings: new Map(), notes: new Map() };
-        entry.count += 1;
-        tally(entry.spellings, label);
+        const pooled = pool.get(key) ?? { count: 0, spellings: new Map(), notes: new Map() };
+        pooled.count += 1;
+        tally(pooled.spellings, label);
         if (note) {
-          tally(entry.notes, note);
+          tally(pooled.notes, note);
         }
-        pool.set(key, entry);
+        pool.set(key, pooled);
       }
 
       const used = [...pool.entries()]

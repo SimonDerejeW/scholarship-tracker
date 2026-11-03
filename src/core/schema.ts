@@ -1,4 +1,5 @@
-import { boolean, date, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { boolean, check, date, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 // Better Auth's tables. Its "user" model is mapped to `member` (see GLOSSARY.md).
 
@@ -69,21 +70,52 @@ export const programme = pgTable("programme", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-/** Date-only: an exact cutoff time, if any, lives in the label. */
-export const deadline = pgTable("deadline", {
+export const scholarship = pgTable("scholarship", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  programmeId: integer("programme_id")
+  name: text("name").notNull(),
+  provider: text("provider").notNull(),
+  link: text("link"),
+  /** What it covers, e.g. tuition and a monthly stipend. */
+  coverage: text("coverage"),
+  notes: text("notes"),
+  addedBy: text("added_by")
     .notNull()
-    .references(() => programme.id, { onDelete: "cascade" }),
-  label: text("label").notNull(),
-  date: date("date", { mode: "string" }).notNull(),
+    .references(() => member.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-export const requirement = pgTable("requirement", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  programmeId: integer("programme_id")
-    .notNull()
-    .references(() => programme.id, { onDelete: "cascade" }),
-  label: text("label").notNull(),
-  note: text("note"),
-});
+// Deadlines and Requirements each belong to exactly one Programme or Scholarship.
+
+/** Date-only: an exact cutoff time, if any, lives in the label. */
+export const deadline = pgTable(
+  "deadline",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    programmeId: integer("programme_id").references(() => programme.id, { onDelete: "cascade" }),
+    scholarshipId: integer("scholarship_id").references(() => scholarship.id, {
+      onDelete: "cascade",
+    }),
+    label: text("label").notNull(),
+    date: date("date", { mode: "string" }).notNull(),
+  },
+  (t) => [
+    check("deadline_one_entry", sql`num_nonnulls(${t.programmeId}, ${t.scholarshipId}) = 1`),
+  ],
+);
+
+export const requirement = pgTable(
+  "requirement",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    programmeId: integer("programme_id").references(() => programme.id, { onDelete: "cascade" }),
+    scholarshipId: integer("scholarship_id").references(() => scholarship.id, {
+      onDelete: "cascade",
+    }),
+    label: text("label").notNull(),
+    note: text("note"),
+  },
+  (t) => [
+    check("requirement_one_entry", sql`num_nonnulls(${t.programmeId}, ${t.scholarshipId}) = 1`),
+  ],
+);
