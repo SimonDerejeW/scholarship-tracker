@@ -16,6 +16,10 @@ _Avoid_: Course, program, degree, opportunity
 A source of funding that is applied to separately from any Programme, with its own Deadlines and Requirements (e.g. DAAD, Chevening).
 _Avoid_: Grant, funding, award, opportunity
 
+**Catalog entry**:
+A Programme or Scholarship in the Catalog: what an Application is made to, and what Deadlines and Requirements belong to.
+_Avoid_: Opportunity, listing, item
+
 **Deadline**:
 A named calendar date by which something must be submitted for a Programme or Scholarship (e.g. "Scholarship priority", "Final, 12:00 CET"); one can have several. An exact cutoff time, if any, lives in its name.
 _Avoid_: Due date, cutoff
@@ -51,7 +55,7 @@ An Application's list of things to complete: the current Requirements of its Pro
 _Avoid_: Todo list, progress
 
 **Personal item**:
-A Checklist entry a Member adds for themselves alone, not shared to the Catalog (e.g. "ask Prof. X for reference by 20 Nov").
+A Checklist item a Member adds for themselves alone, not shared to the Catalog (e.g. "ask Prof. X for reference by 20 Nov").
 _Avoid_: Custom task, note
 
 ## People

@@ -194,16 +194,16 @@ A near-black, blue-cast board with one warm signal colour and two reserved statu
 
 ### Hierarchy
 - **Title** (700, 2.125rem, 1.05, 0.02em, uppercase): page titles (CATALOG, UPCOMING, NOT FOUND), and the sign-in wordmark.
-- **Title, entry name** (700, 2.125rem, 1.05, 0.005em, typed case): a page whose title is an entry, e.g. a Programme's name on its detail page.
+- **Title, entry name** (700, 2.125rem, 1.05, 0.005em, typed case): a page whose title is a Catalog entry, e.g. a Programme's or Scholarship's name on its page, under a mute label-caps line naming its kind (PROGRAMME, SCHOLARSHIP).
 - **Section** (700, 1.375rem, 1.1, 0.04em, uppercase): section headings over a hairline, e.g. DEADLINES, REQUIREMENTS, ADD A DEADLINE.
 - **Entry** (600, 1.1875rem, 1.2): the lead line of a board row (Programme name in typed case), date figures (uppercase, amber), empty-board titles (caps).
 - **Control** (600, 1rem, 0.06em, uppercase): buttons, nav tabs, the header wordmark (at 1.125rem, 700).
-- **Label** (600, 0.875rem, 1.2, 0.06em, uppercase): form labels, tags, small buttons, the weekday/year line under a date.
+- **Label** (600, 0.875rem, 1.2, 0.06em, uppercase): form labels, tags, small buttons, the weekday/year line under a date, the kind line over an entry name, the COVERS label on a Scholarship.
 - **Column label** (600, 0.875rem, 1.2, 0.1em, uppercase, mute): the column strip above board rows.
 - **Body** (400, 1rem, 1.5): everything readable: notes, ledes, row detail. Ledes and notes cap at 65ch. Secondary lines drop to 0.875rem in mute.
 
 ### Named Rules
-**The Typed Case Rule.** Entry names (Programmes, Requirements, Deadlines) keep the case the Member typed. Never uppercase them, not in titles, rows, or the back link. Condensed caps are for chrome, headings, labels, buttons and figures.
+**The Typed Case Rule.** Entry names (Programmes, Scholarships, Requirements, Deadlines) keep the case the Member typed. Never uppercase them, not in titles, rows, or the back link. Condensed caps are for chrome, headings, labels, buttons and figures.
 
 **The Tabular Figures Rule.** Figures are tabular everywhere (set once on the root), so dates and counts align down a column like a real board.
 
@@ -213,9 +213,9 @@ One centred column. The board column is 60rem (960px) wide with a 16px side gutt
 
 The shell is a header with the wordmark and member menu on one line and the nav tabs on the next, closed by a hairline that the current tab's underline overlaps. Main content starts 24px below (32px from the sm breakpoint) and ends with 64px of runout.
 
-Board rows go full-bleed on a phone (they bleed through the 16px gutter) and sit inside the column from 640px up. On a phone each row stacks its lead line over a mute detail line joined by a middle dot; from 640px up the column strip appears and rows become a grid (Catalog: Programme 1.6fr, University 1.2fr, Country 0.7fr; Requirements: two equal columns; Deadlines: a 96px date column then the label). Editor rows take their grid from a per-list column variable: date fields fixed at 11rem, text fields sharing the rest, then the buttons.
+Board rows go full-bleed on a phone (they bleed through the 16px gutter) and sit inside the column from 640px up. On a phone each row stacks its lead line over a mute detail line joined by a middle dot; from 640px up the column strip appears and rows become a grid (Catalog Programmes: Programme 1.6fr, University 1.2fr, Country 0.7fr; Catalog Scholarships: Scholarship 1.6fr, Provider 1fr, Covers 0.9fr; Requirements: two equal columns; Deadlines: a 96px date column then the label). Editor rows take their grid from a per-list column variable: date fields fixed at 11rem, text fields sharing the rest, then the buttons.
 
-Rhythm: rows pad 12px by 16px; form fields stack 24px apart (label to input 8px); sections open 40px below the previous one; the page title and its primary action share a bottom-aligned line. Every touch target is at least 44px tall (40px for pool chips).
+Rhythm: rows pad 12px by 16px; form fields stack 24px apart (label to input 8px); sections open 40px below the previous one; the page title and its primary action, when the view has one, share a bottom-aligned line. Every touch target is at least 44px tall (40px for pool chips).
 
 ## Elevation & Depth
 
@@ -233,8 +233,8 @@ Square-ish. One radius (4px) on every framed element: buttons, inputs, textareas
 ### Buttons
 Restyled shadcn (radix base), set as board lettering: condensed, semibold, uppercase, tracked 0.06em.
 - **Shape:** 4px corners, 1px border (transparent unless outlined).
-- **Primary:** amber fill, board-coloured text, 44px tall, 20px side padding. Used once per view for the thing to do (ADD PROGRAMME, SIGN IN WITH GOOGLE, ADD DEADLINE, SAVE).
-- **Outline:** transparent with an edge stroke and ink text; hover fills with Band Lit. Section and entry EDIT buttons, row SAVE, secondary page actions.
+- **Primary:** amber fill, board-coloured text, 44px tall, 20px side padding. Used once per view for the thing to do (SIGN IN WITH GOOGLE, ADD SCHOLARSHIP on its form, ADD DEADLINE, SAVE). A view with two equal actions has no primary: the Catalog puts ADD PROGRAMME and ADD SCHOLARSHIP as small outline buttons in their boards' section headings.
+- **Outline:** transparent with an edge stroke and ink text; hover fills with Band Lit. Section and entry EDIT buttons, the Catalog's ADD buttons, row SAVE, secondary page actions.
 - **Ghost:** no stroke, mute text; hover fills Band Lit and turns ink. SIGN OUT, row REMOVE.
 - **Small:** 36px tall, 12px padding, label size. Used for EDIT beside headings and SIGN OUT.
 - **Hover / Focus:** 150ms colour transitions; primary hover drops the amber to 85%. Focus is a 2px amber outline offset 2px. Disabled is 50% opacity. Leading icons are 16px line icons.
