@@ -48,7 +48,6 @@ Signing in with `ADMIN_EMAIL` lands on Upcoming; any other Google account sees t
 
 Production runs on Vercel's free Hobby plan with Neon's free Postgres, added through the Vercel Marketplace. Nothing should ask for a card. Don't buy a domain, upgrade to Pro, or pick a paid Neon plan.
 
-- **Region:** `vercel.json` pins functions to Frankfurt (`fra1`), the closest region to Addis Ababa. Create the Neon database in Frankfurt too.
 - **Migrations:** production builds run `npm run db:migrate` before `next build`. Preview builds skip it, so they never touch the production schema. Migrations use `DATABASE_URL_UNPOOLED` (set by the Neon integration) when present, else `DATABASE_URL`.
 - **Environment variables** (Production scope in Vercel):
   - `DATABASE_URL` and `DATABASE_URL_UNPOOLED`: set by the Neon integration.
