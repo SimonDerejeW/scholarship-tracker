@@ -48,7 +48,7 @@ Signing in with `ADMIN_EMAIL` lands on Upcoming; any other Google account sees t
 
 Production runs on Vercel's free Hobby plan with Neon's free Postgres, added through the Vercel Marketplace. Nothing should ask for a card. Don't buy a domain, upgrade to Pro, or pick a paid Neon plan.
 
-- **Migrations:** production builds run `npm run db:migrate` before `next build`. Preview builds skip it, so they never touch the production schema. Migrations use `DATABASE_URL_UNPOOLED` (set by the Neon integration) when present, else `DATABASE_URL`.
+- **Migrations:** production builds run `npm run db:migrate` before `next build`. Migrations use `DATABASE_URL_UNPOOLED` (set by the Neon integration) when present, else `DATABASE_URL`.
 - **Environment variables** (Production scope in Vercel):
   - `DATABASE_URL` and `DATABASE_URL_UNPOOLED`: set by the Neon integration.
   - `ADMIN_EMAIL`.
@@ -56,7 +56,7 @@ Production runs on Vercel's free Hobby plan with Neon's free Postgres, added thr
   - `BETTER_AUTH_URL`: the production URL, e.g. `https://scholarship-tracker.vercel.app`.
   - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`.
 - **Google Cloud Console:** add `${BETTER_AUTH_URL}/api/auth/callback/google` for the production URL as a second redirect URI. Then publish the OAuth consent screen ("In production"): in "Testing" mode, Google blocks every account not listed as a test user. Only email and profile are requested, so no Google verification is needed. The Allowlist still decides who gets in.
-- **Preview deployments** can't sign in, because `BETTER_AUTH_URL` points at production. That's expected.
+- **Preview deployments are skipped.** `ignoreCommand` in `vercel.json` cancels every non-production build, so PRs show the Vercel build as skipped rather than failed. Previews would have no env vars (all are Production-scoped) and couldn't sign in anyway, since `BETTER_AUTH_URL` points at production. Run `npm test`, `npm run typecheck` and `npm run lint` locally instead.
 
 ## Contributing
 
