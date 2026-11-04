@@ -220,7 +220,7 @@ One extra breakpoint, `wide` (60rem, the board column's width), is where Upcomin
 
 Board rows go full-bleed on a phone (they bleed through the 16px gutter) and sit inside the column from 640px up. On a phone each row stacks its lead line over a mute detail line joined by a middle dot; from 640px up the column strip appears and rows become a grid (Catalog: a 96px Deadline column, then Programme 1.6fr, University 1.2fr, Country 0.7fr, or Scholarship 1.6fr, Provider 1fr, Covers 0.9fr; Requirements: two equal columns; Deadlines: a 96px date column then the label). Editor rows take their grid from a per-list column variable: date fields fixed at 11rem, text fields sharing the rest, then the buttons.
 
-Rhythm: rows pad 12px by 16px; form fields stack 24px apart (label to input 8px); sections open 40px below the previous one; the page title and its primary action, when the view has one, share a bottom-aligned line. Every touch target is at least 44px tall (40px for pool chips).
+Rhythm: rows pad 12px by 16px; form fields stack 24px apart (label to input 8px); sections open 40px below the previous one; the page title and its primary action, when the view has one, share a bottom-aligned line. Every touch target is at least 44px tall (40px for pool chips); small buttons and checkboxes get there with an invisible hit area.
 
 ## Elevation & Depth
 
@@ -241,7 +241,8 @@ Restyled shadcn (radix base), set as board lettering: condensed, semibold, upper
 - **Primary:** amber fill, board-coloured text, 44px tall, 20px side padding. Used once per view for the thing to do (SIGN IN WITH GOOGLE, ADD SCHOLARSHIP on its form, ADD DEADLINE, SAVE). A view with two equal actions has no primary: the Catalog puts ADD PROGRAMME and ADD SCHOLARSHIP as small outline buttons in their boards' section headings.
 - **Outline:** transparent with an edge stroke and ink text; hover fills with Band Lit. Section and entry EDIT buttons, the Catalog's ADD buttons, row SAVE, secondary page actions.
 - **Ghost:** no stroke, mute text; hover fills Band Lit and turns ink. SIGN OUT, row REMOVE.
-- **Small:** 36px tall, 12px padding, label size. Used for EDIT beside headings and SIGN OUT.
+- **Small:** 36px tall with a 44px hit area, 12px padding, label size. Used for EDIT beside headings and SIGN OUT.
+- **Link:** ink with an edge underline, amber on hover, like every other link. Used for the Requirement pool's ALL / FEWER toggle.
 - **Hover / Focus:** 150ms colour transitions; primary hover drops the amber to 85%. Focus is a 2px amber outline offset 2px. Disabled is 50% opacity. Leading icons are 16px line icons.
 
 ### Chips (Requirement pool)
@@ -256,7 +257,7 @@ Restyled shadcn (radix base), set as board lettering: condensed, semibold, upper
 - **Labels:** label type in caps above the field; "optional" sits beside it in plain lowercase mute Barlow; hints sit below in 0.875rem mute.
 - **Focus:** stroke and 2px outline both turn amber. Hover lifts the stroke to mute.
 - **Error / Disabled:** an invalid field swaps its stroke to ink; the message is an ErrorNote. Disabled is 50% opacity.
-- **Checkbox:** 20px square, 4px corners, Row Band fill, edge stroke, with a 44px hit area.
+- **Checkbox:** 20px square, 4px corners, Row Band fill, edge stroke, with a 44px hit area. Checked, it fills ink with a board-coloured tick, never amber: a Checklist is mostly ticks, and amber is scarce.
 
 ### Navigation
 - **Style:** condensed caps tabs (control type), 44px tall, 24px apart, sitting on the header's hairline.

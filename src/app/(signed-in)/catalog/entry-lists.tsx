@@ -64,7 +64,7 @@ export async function RequirementsEditor({
         rows={data.requirements}
         fields={[
           { name: "label", label: "Requirement", required: true, placeholder: "e.g. CV" },
-          { name: "note", label: "Note (optional)" },
+          { name: "note", label: "Note" },
         ]}
         add={addRequirement.bind(null, entry)}
         edit={editRequirement}

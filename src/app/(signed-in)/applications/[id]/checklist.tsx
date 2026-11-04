@@ -130,10 +130,7 @@ function withTick(checklist: ChecklistData, { list, id, ticked }: Tick): Checkli
   };
 }
 
-/**
- * A checkbox and the item it ticks off, in typed case. Ticked items are struck through.
- * Checked boxes are ink, not amber: a Checklist is mostly ticks, and amber is scarce (DESIGN.md).
- */
+/** A checkbox and the item it ticks off, in typed case. Ticked items are struck through. */
 function TickBox({
   ticked,
   onTick,
@@ -152,7 +149,7 @@ function TickBox({
         id={id}
         checked={ticked}
         onCheckedChange={(checked) => onTick(checked === true)}
-        className="mt-0.5 data-[state=checked]:border-foreground data-[state=checked]:bg-foreground data-[state=checked]:text-background"
+        className="mt-0.5"
       />
       <label htmlFor={id} className="min-w-0 cursor-pointer">
         <span

@@ -1,6 +1,6 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "cn"
+import { cn } from "@/lib/utils"
 import { Slot } from "radix-ui"
 
 const buttonVariants = cva(
@@ -11,11 +11,13 @@ const buttonVariants = cva(
         default: "bg-primary text-primary-foreground hover:bg-primary/85",
         outline: "border-input bg-transparent text-foreground hover:bg-accent",
         ghost: "text-muted-foreground hover:bg-accent hover:text-foreground",
-        link: "h-auto px-0 text-primary underline-offset-4 hover:underline",
+        // Links are ink at rest and turn amber only on hover (DESIGN.md).
+        link: "text-foreground underline decoration-edge underline-offset-4 hover:text-amber hover:decoration-amber",
       },
       size: {
         default: "h-11 gap-2 px-5 text-base",
-        sm: "h-9 gap-1.5 px-3 text-label",
+        // 36px to look at, with a 44px hit area.
+        sm: "relative h-9 gap-1.5 px-3 text-label after:absolute after:inset-x-0 after:-inset-y-1",
       },
     },
     defaultVariants: {

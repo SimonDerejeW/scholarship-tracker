@@ -20,7 +20,7 @@ import {
 import { cn } from "@/lib/utils";
 import { core } from "@/server/core";
 import { requireMember } from "@/server/session";
-import { today } from "@/server/today";
+import { CIRCLE_CITY, today } from "@/server/today";
 import { DateBlock } from "./catalog/date-block";
 import { dateParts } from "./catalog/format";
 import { DaysLeft } from "./days-left";
@@ -58,7 +58,7 @@ async function Upcoming({ searchParams }: Pick<PageProps<"/">, "searchParams">) 
             <time dateTime={date}>
               {parts.weekday} {parts.dayMonth}
             </time>{" "}
-            · Addis Ababa
+            · {CIRCLE_CITY}
           </p>
         </div>
         <StageFilter stages={STAGES} value={filter} />

@@ -55,7 +55,7 @@ async function Admin() {
               Add an email above so its owner can sign in.
             </EmptyBoard>
           ) : (
-            <BoardRows>
+            <BoardRows className="border-t border-rule">
               {allowlist.map((email) => (
                 <li key={email} className={`${boardRow} flex items-center justify-between gap-2`}>
                   <span className="min-w-0 break-all">{email}</span>
@@ -79,7 +79,7 @@ async function Admin() {
           Everyone who has signed in. Taking an email off the Allowlist signs that Member out but
           keeps their Applications; removing the Member deletes them.
         </p>
-        <BoardRows className="mt-4">
+        <BoardRows className="mt-4 border-t border-rule">
           {members.map((member) => (
             <li key={member.id} className={`${boardRow} flex items-start justify-between gap-2`}>
               <div className="min-w-0">

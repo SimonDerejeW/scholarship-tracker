@@ -290,11 +290,7 @@ function Field({
     <div className="flex flex-col gap-2">
       <Label htmlFor={id}>
         {label}
-        {optional && (
-          <span className="font-sans text-sm font-normal tracking-normal text-muted-foreground normal-case">
-            optional
-          </span>
-        )}
+        {optional && <Optional />}
       </Label>
       {children(id, hintId)}
       {hint && (
@@ -304,6 +300,15 @@ function Field({
       )}
       {after}
     </div>
+  );
+}
+
+/** Beside a label: the field may be left empty. Plain lowercase, not board caps. */
+function Optional() {
+  return (
+    <span className="font-sans text-sm leading-none font-normal tracking-normal text-muted-foreground normal-case">
+      optional
+    </span>
   );
 }
 
@@ -558,6 +563,7 @@ function RowInputs({
         className={labels === "phone" ? "sm:sr-only" : undefined}
       >
         {field.label}
+        {!field.required && <Optional />}
       </Label>
       <Input
         id={`${id}-${field.name}`}
