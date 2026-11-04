@@ -276,6 +276,7 @@ The board itself. A list sits under a column strip (column-label type, mute, rul
 - **Days left:** split-flap tiles, amber figures on Flap, 4px corners, 32px tall, two tiles (three from 100 days), "– –" in mute for Deadline TBA, with DAYS (DAY, TODAY) in small mute caps below. They flip in once on load, staggered down the board, and are static under reduced motion.
 - **Stage word:** label caps; green while moving, ink at Interested, mute once finished (Accepted, Rejected, Withdrawn), amber when highlighted, red when Missed.
 - **Highlight:** an Interested Application whose next Deadline is at most 30 days off gets a 3px amber left rule and an amber Stage word.
+- **Linked Applications:** a Scholarship Application linked to a Programme Application sits directly under it, its name indented behind a mute corner arrow; the pair takes the place of whichever of the two is due sooner. On the Application page, the link shows as board rows to the other Application, and a Scholarship Application picks its Programme Application from a select lettered in typed case.
 - **Missed:** the last Deadline's date and the name drop to mute, the Stage word and a bold MISSED in the days column turn red. A later-Stage Application whose Deadlines have all passed shows its last date in mute and PASSED in mute caps. Entries with no Deadlines show TBA and "Deadline TBA".
 
 ## Do's and Don'ts

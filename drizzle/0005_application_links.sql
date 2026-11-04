@@ -1,0 +1,3 @@
+ALTER TABLE "application" ADD COLUMN "funds_application_id" integer;--> statement-breakpoint
+ALTER TABLE "application" ADD CONSTRAINT "application_funds_application_id_application_id_fk" FOREIGN KEY ("funds_application_id") REFERENCES "public"."application"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "application" ADD CONSTRAINT "application_only_scholarship_funds" CHECK ("application"."funds_application_id" is null or "application"."scholarship_id" is not null);

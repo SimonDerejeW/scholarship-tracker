@@ -1,5 +1,6 @@
 import { and, asc, eq, inArray, isNotNull } from "drizzle-orm";
-import { belongsTo, type CatalogEntry } from "./entries";
+import { entryOf } from "./applications";
+import { belongsTo } from "./entries";
 import { NotFoundError } from "./errors";
 import { found, isId, required } from "./fields";
 import type { Db } from "./index";
@@ -136,25 +137,6 @@ async function updateMyPersonalItem(
 
 function personalLabel(label: string) {
   return required(label, "A Personal item needs a label.");
-}
-
-/** The Programme or Scholarship one of this Member's Applications is to, or null. */
-async function entryOf(db: Db, memberId: string, applicationId: number) {
-  if (!isId(applicationId)) {
-    return null;
-  }
-  const [row] = await db
-    .select({ programmeId: application.programmeId, scholarshipId: application.scholarshipId })
-    .from(application)
-    .where(and(eq(application.memberId, memberId), eq(application.id, applicationId)));
-  if (!row) {
-    return null;
-  }
-  return (
-    row.programmeId !== null
-      ? { kind: "programme", id: row.programmeId }
-      : { kind: "scholarship", id: row.scholarshipId! }
-  ) satisfies CatalogEntry;
 }
 
 /** Like `entryOf`, but another Member's Application, or a deleted one, throws NotFoundError. */

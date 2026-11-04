@@ -1,5 +1,6 @@
 import { sql } from "drizzle-orm";
 import {
+  type AnyPgColumn,
   boolean,
   check,
   date,
@@ -158,11 +159,23 @@ export const application = pgTable(
     scholarshipId: integer("scholarship_id").references(() => scholarship.id),
     stage: stage("stage").notNull().default("Interested"),
     notes: text("notes"),
+    /**
+     * For a Scholarship Application: the same Member's Programme Application it would fund,
+     * if they have picked one. Deleting that Programme Application clears the link.
+     */
+    fundsApplicationId: integer("funds_application_id").references(
+      (): AnyPgColumn => application.id,
+      { onDelete: "set null" },
+    ),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
   (t) => [
     check("application_one_entry", sql`num_nonnulls(${t.programmeId}, ${t.scholarshipId}) = 1`),
+    check(
+      "application_only_scholarship_funds",
+      sql`${t.fundsApplicationId} is null or ${t.scholarshipId} is not null`,
+    ),
     unique("application_one_per_programme").on(t.memberId, t.programmeId),
     unique("application_one_per_scholarship").on(t.memberId, t.scholarshipId),
   ],

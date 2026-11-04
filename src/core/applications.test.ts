@@ -11,7 +11,7 @@ const daad = { name: "DAAD Study Scholarship", provider: "DAAD" };
 const today = "2026-11-03";
 
 describe("starting an Application", () => {
-  test("to a Programme begins at Interested, with no notes", async ({ db }) => {
+  test("to a Programme begins at Interested, with no notes and unlinked", async ({ db }) => {
     const core = setup(db);
     const ana = await addMember(db, { name: "Ana" });
     const programmeId = await core.addProgramme(ana.id, robotics);
@@ -23,6 +23,8 @@ describe("starting an Application", () => {
       stage: "Interested",
       notes: null,
       entry: { kind: "programme", id: programmeId, name: "MSc Robotics", detail: "TU Delft" },
+      funds: null,
+      fundedBy: [],
     });
   });
 });

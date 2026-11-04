@@ -76,9 +76,41 @@ export function upcomingOperations(db: Db) {
       const group = (row: (typeof listed)[number]) =>
         row.nextDeadline ? 0 : row.missed ? 1 : row.lastDeadline ? 2 : 3;
       const date = (row: (typeof listed)[number]) => row.nextDeadline?.date ?? "";
-      return listed.sort((a, b) => group(a) - group(b) || date(a).localeCompare(date(b)));
+      return withLinkedTogether(
+        listed.sort((a, b) => group(a) - group(b) || date(a).localeCompare(date(b))),
+      );
     },
   };
+}
+
+/**
+ * Moves each Scholarship Application linked to a shown Programme Application to just after it.
+ * `fundsApplicationId` is left set only on those, so a link to a Programme Application that
+ * isn't shown (say, filtered out by Stage) reads as unlinked.
+ * The pair takes the place of whichever of them comes first, so an early Scholarship Deadline
+ * still surfaces.
+ */
+function withLinkedTogether<Row extends { id: number; fundsApplicationId: number | null }>(
+  rows: Row[],
+) {
+  const shown = new Map(rows.map((row) => [row.id, row]));
+  const leadOf = (row: Row) =>
+    row.fundsApplicationId !== null && shown.has(row.fundsApplicationId)
+      ? row.fundsApplicationId
+      : row.id;
+  const placed = new Set<number>();
+  return rows.flatMap((row) => {
+    const lead = leadOf(row);
+    if (placed.has(lead)) {
+      return [];
+    }
+    placed.add(lead);
+    const linked = rows.filter((other) => other.id !== lead && leadOf(other) === lead);
+    return [shown.get(lead)!, ...linked].map((other) => ({
+      ...other,
+      fundsApplicationId: other.id === lead ? null : lead,
+    }));
+  });
 }
 
 /** Joins a Deadline or Requirement to the Applications made to its Programme or Scholarship. */

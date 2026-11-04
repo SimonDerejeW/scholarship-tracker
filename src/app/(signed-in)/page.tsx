@@ -1,3 +1,4 @@
+import { CornerDownRight } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import {
@@ -92,6 +93,9 @@ function Empty({ filter }: { filter: Filter }) {
 type Row = Awaited<ReturnType<typeof core.upcoming>>[number];
 
 /**
+ * A Scholarship Application linked to a Programme Application comes straight after it,
+ * its name indented under the Programme's.
+ *
  * The columns: on a phone, Date / Application (with Stage and Checklist on its second line) /
  * Days; from the wide breakpoint, Date / Application / Stage / Checklist / Days.
  */
@@ -120,7 +124,18 @@ function Board({ applications }: { applications: Row[] }) {
               )}
             >
               <DateCell application={application} />
-              <span className="block min-w-0">
+              <span
+                className={cn(
+                  "block min-w-0",
+                  application.fundsApplicationId !== null && "relative pl-6",
+                )}
+              >
+                {application.fundsApplicationId !== null && (
+                  <CornerDownRight
+                    aria-hidden
+                    className="absolute top-1 left-0 size-4 text-muted-foreground"
+                  />
+                )}
                 <span
                   className={cn(
                     "block font-display text-entry font-semibold",
@@ -128,6 +143,9 @@ function Board({ applications }: { applications: Row[] }) {
                   )}
                 >
                   {application.entry.name}
+                  {application.fundsApplicationId !== null && (
+                    <span className="sr-only">, for the Programme Application above</span>
+                  )}
                 </span>
                 <span className="mt-1 block text-sm text-muted-foreground">
                   <span className="wide:hidden">

@@ -1,10 +1,18 @@
 "use client";
 
 import { Check, Trash2 } from "lucide-react";
-import { useActionState, useId, useOptimistic, useTransition, type MouseEvent } from "react";
+import {
+  useActionState,
+  useId,
+  useOptimistic,
+  useState,
+  useTransition,
+  type MouseEvent,
+} from "react";
 import { FormError } from "@/components/board";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import type { Stage } from "@/core";
@@ -53,6 +61,54 @@ export function StagePicker({
           </Button>
         );
       })}
+    </div>
+  );
+}
+
+/**
+ * Picks the Programme Application a Scholarship Application would fund, or none; the choice
+ * saves straight away. `link` returns a message when the choice can't be saved.
+ */
+export function LinkPicker({
+  options,
+  value,
+  link,
+}: {
+  options: { id: number; name: string; detail: string }[];
+  value: number | null;
+  link: (programmeApplicationId: number | null) => Promise<string | undefined>;
+}) {
+  const [shown, setShown] = useOptimistic(value);
+  const [error, setError] = useState<string>();
+  const [pending, startTransition] = useTransition();
+  const id = useId();
+
+  function pick(next: number | null) {
+    startTransition(async () => {
+      setShown(next);
+      setError(await link(next));
+    });
+  }
+
+  return (
+    <div className="mt-4 flex max-w-form flex-col gap-3">
+      <Label htmlFor={id}>Would fund</Label>
+      <NativeSelect
+        id={id}
+        typedCase
+        className="w-full"
+        value={shown ?? ""}
+        aria-busy={pending}
+        onChange={(event) => pick(event.target.value ? Number(event.target.value) : null)}
+      >
+        <NativeSelectOption value="">Not linked yet</NativeSelectOption>
+        {options.map((option) => (
+          <NativeSelectOption key={option.id} value={option.id}>
+            {option.name} · {option.detail}
+          </NativeSelectOption>
+        ))}
+      </NativeSelect>
+      <FormError error={error} />
     </div>
   );
 }

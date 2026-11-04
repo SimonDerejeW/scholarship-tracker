@@ -35,6 +35,33 @@ export async function setStage(id: number, stage: string): Promise<void> {
   revalidatePath("/", "layout");
 }
 
+/**
+ * Links a Scholarship Application to the Programme Application it would fund, or unlinks it
+ * when given null. A rule broken (say, the Programme Application was deleted in another tab)
+ * comes back as a message to show.
+ */
+export async function linkApplication(
+  id: number,
+  programmeApplicationId: number | null,
+): Promise<string | undefined> {
+  const member = await requireMember();
+  let message;
+  try {
+    if (programmeApplicationId === null) {
+      await core.unlinkApplication(member.id, id);
+    } else {
+      await core.linkApplication(member.id, id, programmeApplicationId);
+    }
+  } catch (error) {
+    if (!(error instanceof InvalidInputError || error instanceof NotFoundError)) {
+      throw error;
+    }
+    message = error.message;
+  }
+  revalidatePath("/", "layout");
+  return message;
+}
+
 export async function editApplicationNotes(
   id: number,
   _state: NotesState,

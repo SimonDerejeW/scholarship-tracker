@@ -42,6 +42,7 @@ describe("an Application's next Deadline", () => {
         missed: false,
         highlight: true,
         progress: { done: 0, total: 0 },
+        fundsApplicationId: null,
       },
     ]);
   });

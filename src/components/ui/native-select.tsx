@@ -2,8 +2,15 @@ import * as React from "react"
 import { cn } from "cn"
 import { ChevronDownIcon } from "lucide-react"
 
-/** A native select, set like an input but lettered as board chrome: condensed caps. */
-function NativeSelect({ className, ...props }: React.ComponentProps<"select">) {
+/**
+ * A native select, set like an input but lettered as board chrome: condensed caps. With
+ * `typedCase`, for options that are entry names, it is lettered in body type and typed case.
+ */
+function NativeSelect({
+  className,
+  typedCase = false,
+  ...props
+}: React.ComponentProps<"select"> & { typedCase?: boolean }) {
   return (
     <div
       className={cn(
@@ -14,7 +21,12 @@ function NativeSelect({ className, ...props }: React.ComponentProps<"select">) {
     >
       <select
         data-slot="native-select"
-        className="h-11 w-full min-w-0 appearance-none rounded-md border border-input bg-band pr-9 pl-3 font-display text-base font-semibold tracking-[0.06em] text-foreground uppercase transition-colors outline-none [color-scheme:dark] hover:border-mute focus-visible:border-ring focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring disabled:pointer-events-none disabled:cursor-not-allowed"
+        className={cn(
+          "h-11 w-full min-w-0 appearance-none truncate rounded-md border border-input bg-band pr-9 pl-3 text-base text-foreground transition-colors outline-none [color-scheme:dark] hover:border-mute focus-visible:border-ring focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring disabled:pointer-events-none disabled:cursor-not-allowed",
+          typedCase
+            ? "font-sans"
+            : "font-display font-semibold tracking-[0.06em] uppercase"
+        )}
         {...props}
       />
       <ChevronDownIcon
