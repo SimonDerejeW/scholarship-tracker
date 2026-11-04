@@ -1,10 +1,12 @@
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
 import { applicationOperations } from "./applications";
 import { checklistOperations } from "./checklists";
+import { deletionOperations } from "./deletion";
 import { entryListOperations } from "./entries";
 import { programmeOperations } from "./programmes";
 import { requirementPoolOperations } from "./requirement-pool";
 import { scholarshipOperations } from "./scholarships";
+import { searchOperations } from "./search";
 import type * as schema from "./schema";
 import { upcomingOperations } from "./upcoming";
 
@@ -13,7 +15,7 @@ export type { CatalogEntry } from "./entries";
 export type { StageFilter } from "./upcoming";
 export { MOVING_STAGES, OPEN_STAGES, toStageFilter } from "./upcoming";
 export { STAGES } from "./schema";
-export { InvalidInputError, NotFoundError } from "./errors";
+export { InvalidInputError, NotAllowedError, NotFoundError } from "./errors";
 
 // The core module: every rule lives here, and it is the only code that talks to
 // the database. Next.js routes and server actions are thin adapters over it.
@@ -33,6 +35,8 @@ export function createCore({ db, adminEmail }: CoreConfig) {
     ...programmeOperations(db),
     ...scholarshipOperations(db),
     ...entryListOperations(db),
+    ...searchOperations(db),
+    ...deletionOperations(db),
     ...requirementPoolOperations(db),
     ...applicationOperations(db),
     ...checklistOperations(db),

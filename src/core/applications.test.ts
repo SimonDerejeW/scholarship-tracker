@@ -223,9 +223,8 @@ describe("an Application's privacy", () => {
     const catalog = () =>
       Promise.all([
         core.getProgramme(bo.id, programmeId),
-        core.listProgrammes(bo.id, "2027-01-01"),
         core.getScholarship(bo.id, scholarshipId),
-        core.listScholarships(bo.id, "2027-01-01"),
+        core.searchCatalog(bo.id, "", "2027-01-01"),
       ]);
     const before = await catalog();
 

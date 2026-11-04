@@ -226,7 +226,7 @@ describe("Programme input", () => {
     await expect(core.addProgramme(ana.id, { ...erasmus, university: "" })).rejects.toThrow(
       new InvalidInputError("A Programme needs a university."),
     );
-    expect(await core.listProgrammes(ana.id, "2027-01-01")).toEqual([]);
+    expect((await core.searchCatalog(ana.id, "", "2027-01-01")).programmes).toEqual([]);
   });
 
   test("trims text and leaves blank optional fields empty", async ({ db }) => {
@@ -303,7 +303,7 @@ describe("the Catalog", () => {
       university: "KU Leuven",
     });
 
-    const programmes = await core.listProgrammes(ana.id, "2027-01-01");
+    const { programmes } = await core.searchCatalog(ana.id, "", "2027-01-01");
 
     expect(programmes.map(({ name, university }) => ({ name, university }))).toEqual([
       { name: "MSc artificial intelligence", university: "KU Leuven" },
@@ -333,7 +333,7 @@ describe("the Catalog", () => {
     await core.addDeadline(ana.id, programmeEntry(today), { label: "Final", date: "2027-01-15" });
     await core.addDeadline(ana.id, programmeEntry(passed), { label: "Final", date: "2027-01-14" });
 
-    const programmes = await core.listProgrammes(ana.id, "2027-01-15");
+    const { programmes } = await core.searchCatalog(ana.id, "", "2027-01-15");
 
     expect(
       programmes.map(({ name, nextDeadline, deadlinesPassed }) => ({

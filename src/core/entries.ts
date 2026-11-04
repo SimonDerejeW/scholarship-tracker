@@ -9,7 +9,10 @@ import { deadline, programme, requirement, scholarship } from "./schema";
 /** A Programme or Scholarship in the Catalog. */
 export type CatalogEntry = { kind: keyof typeof KINDS; id: number };
 
-/** Each kind of entry: its table, its name, and the column pointing a Deadline or Requirement at it. */
+/**
+ * Each kind of entry: its table, its name, and the column pointing a Deadline, Requirement or
+ * Application at it.
+ */
 export const KINDS = {
   programme: { table: programme, name: "Programme", owner: "programmeId" },
   scholarship: { table: scholarship, name: "Scholarship", owner: "scholarshipId" },

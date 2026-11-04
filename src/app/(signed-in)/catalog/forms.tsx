@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Plus } from "lucide-react";
 import { useActionState, useId, useRef, useState, type MouseEvent } from "react";
 import { BoardColumns, BoardRows, boardRow, FormError, SectionHeading } from "@/components/board";
@@ -8,9 +9,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import type { FormState } from "@/server/catalog-actions";
+import type { CatalogEntry } from "@/core";
+import type { CatalogMatch, FormState } from "@/server/catalog-actions";
+import { entryHref } from "./routes";
 
 type FormAction = (state: FormState, formData: FormData) => Promise<FormState>;
+
+/** Finds entries already in the Catalog matching a name being typed, to catch duplicates. */
+type FindMatches = (query: string) => Promise<CatalogMatch[]>;
 
 type ProgrammeValues = {
   name: string;
@@ -25,10 +31,13 @@ export function ProgrammeForm({
   action,
   programme,
   submitLabel,
+  findMatches,
 }: {
   action: FormAction;
   programme?: ProgrammeValues;
   submitLabel: string;
+  /** Given when adding, to show matching Programmes already in the Catalog. */
+  findMatches?: FindMatches;
 }) {
   const [state, formAction, pending] = useActionState(action, {});
   const values = state.values ?? {
@@ -42,17 +51,12 @@ export function ProgrammeForm({
 
   return (
     <form action={formAction} className="mt-8 flex max-w-form flex-col gap-6">
-      <Field label="Name" hint="e.g. MSc Data Science">
-        {(id, hintId) => (
-          <Input
-            id={id}
-            aria-describedby={hintId}
-            name="name"
-            required
-            defaultValue={values.name}
-          />
-        )}
-      </Field>
+      <NameField
+        hint="e.g. MSc Data Science"
+        defaultValue={values.name}
+        kind="programme"
+        findMatches={findMatches}
+      />
       <Field label="University">
         {(id) => <Input id={id} name="university" required defaultValue={values.university} />}
       </Field>
@@ -88,10 +92,13 @@ export function ScholarshipForm({
   action,
   scholarship,
   submitLabel,
+  findMatches,
 }: {
   action: FormAction;
   scholarship?: ScholarshipValues;
   submitLabel: string;
+  /** Given when adding, to show matching Scholarships already in the Catalog. */
+  findMatches?: FindMatches;
 }) {
   const [state, formAction, pending] = useActionState(action, {});
   const values = state.values ?? {
@@ -104,17 +111,12 @@ export function ScholarshipForm({
 
   return (
     <form action={formAction} className="mt-8 flex max-w-form flex-col gap-6">
-      <Field label="Name" hint="e.g. DAAD Study Scholarship">
-        {(id, hintId) => (
-          <Input
-            id={id}
-            aria-describedby={hintId}
-            name="name"
-            required
-            defaultValue={values.name}
-          />
-        )}
-      </Field>
+      <NameField
+        hint="e.g. DAAD Study Scholarship"
+        defaultValue={values.name}
+        kind="scholarship"
+        findMatches={findMatches}
+      />
       <Field label="Provider" hint="Who awards it, e.g. DAAD">
         {(id, hintId) => (
           <Input
@@ -152,6 +154,101 @@ export function ScholarshipForm({
   );
 }
 
+/** How long typing pauses before looking for duplicates. */
+const TYPING_PAUSE_MS = 300;
+
+/**
+ * An entry's name. When adding, existing entries matching what's typed are listed under it,
+ * linking to them, so a duplicate is caught before it's created.
+ */
+function NameField({
+  hint,
+  defaultValue,
+  kind,
+  findMatches,
+}: {
+  hint: string;
+  defaultValue: string;
+  kind: CatalogEntry["kind"];
+  findMatches?: FindMatches;
+}) {
+  const [matches, setMatches] = useState<CatalogMatch[]>([]);
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const latest = useRef(0);
+
+  function lookUp(name: string) {
+    if (!findMatches) {
+      return;
+    }
+    clearTimeout(timer.current);
+    const lookup = ++latest.current;
+    timer.current = setTimeout(async () => {
+      const found = await findMatches(name);
+      // A slower, older lookup must not replace a newer one's answer.
+      if (lookup === latest.current) {
+        setMatches(found);
+      }
+    }, TYPING_PAUSE_MS);
+  }
+
+  return (
+    <Field
+      label="Name"
+      hint={hint}
+      after={
+        findMatches && (
+          <div role="status">
+            {matches.length > 0 && <AlreadyInCatalog matches={matches} kind={kind} />}
+          </div>
+        )
+      }
+    >
+      {(id, hintId) => (
+        <Input
+          id={id}
+          aria-describedby={hintId}
+          name="name"
+          required
+          autoComplete="off"
+          defaultValue={defaultValue}
+          onChange={(event) => lookUp(event.target.value)}
+        />
+      )}
+    </Field>
+  );
+}
+
+function AlreadyInCatalog({
+  matches,
+  kind,
+}: {
+  matches: CatalogMatch[];
+  kind: CatalogEntry["kind"];
+}) {
+  return (
+    <div>
+      <p className="board-caps text-label font-semibold text-muted-foreground">
+        Already in Catalog
+      </p>
+      <ul>
+        {matches.map((match) => (
+          <li key={match.id}>
+            <Link
+              href={entryHref({ kind, id: match.id })}
+              className="inline-flex min-h-10 items-center underline decoration-edge underline-offset-4 transition-colors duration-150 hover:text-amber hover:decoration-amber"
+            >
+              <span className="min-w-0">
+                {match.name}
+                <span className="text-muted-foreground"> · {match.detail}</span>
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function FundingIncludedField({ defaultChecked }: { defaultChecked: boolean }) {
   const id = useId();
   return (
@@ -177,11 +274,14 @@ function Field({
   label,
   hint,
   optional,
+  after,
   children,
 }: {
   label: string;
   hint?: string;
   optional?: boolean;
+  /** Shown under the hint. */
+  after?: React.ReactNode;
   children: (id: string, hintId?: string) => React.ReactNode;
 }) {
   const id = useId();
@@ -202,6 +302,7 @@ function Field({
           {hint}
         </p>
       )}
+      {after}
     </div>
   );
 }

@@ -2,9 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { InvalidInputError, NotFoundError, type CatalogEntry } from "@/core";
+import { InvalidInputError, NotAllowedError, NotFoundError, type CatalogEntry } from "@/core";
 import { core } from "./core";
 import { requireMember } from "./session";
+import { today } from "./today";
 
 /** What a Catalog form shows after submitting: a rule broken, with what was typed so it isn't lost. */
 export type FormState = { error?: string; values?: Record<string, string> };
@@ -61,6 +62,50 @@ export async function editScholarship(
     return state;
   }
   redirect(`/catalog/scholarships/${id}`);
+}
+
+/** An existing entry an add form shows as a possible duplicate of what is being typed. */
+export type CatalogMatch = { id: number; name: string; detail: string };
+
+/** How many possible duplicates an add form shows at most. */
+const MATCHES_SHOWN = 5;
+
+/** Programmes or Scholarships already in the Catalog that match a name being typed. */
+export async function findInCatalog(
+  kind: CatalogEntry["kind"],
+  query: string,
+): Promise<CatalogMatch[]> {
+  const member = await requireMember();
+  if (query.trim().length < 2) {
+    return [];
+  }
+  const found = await core.searchCatalog(member.id, query, await today());
+  const matches =
+    kind === "programme"
+      ? found.programmes.map(({ id, name, university }) => ({ id, name, detail: university }))
+      : found.scholarships.map(({ id, name, provider }) => ({ id, name, detail: provider }));
+  return matches.slice(0, MATCHES_SHOWN);
+}
+
+/**
+ * Deletes a Programme or Scholarship and returns to the Catalog. A refusal (not the adder, or
+ * someone has an Application to it) comes back as a message to show.
+ */
+export async function deleteCatalogEntry(
+  entry: CatalogEntry,
+  _state: FormState,
+): Promise<FormState> {
+  const member = await requireMember();
+  try {
+    await core.deleteCatalogEntry(member.id, entry);
+  } catch (error) {
+    if (error instanceof NotAllowedError || error instanceof NotFoundError) {
+      return { error: error.message };
+    }
+    throw error;
+  }
+  revalidatePath("/", "layout");
+  redirect("/catalog");
 }
 
 export async function addDeadline(

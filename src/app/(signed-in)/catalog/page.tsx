@@ -15,28 +15,27 @@ import { Button } from "@/components/ui/button";
 import { core } from "@/server/core";
 import { requireMember } from "@/server/session";
 import { today } from "@/server/today";
+import { CatalogSearch } from "./catalog-search";
 import { DateBlock } from "./date-block";
 import { FundingIncluded } from "./funding-included";
 import { entryHref } from "./routes";
 
-export default function CatalogPage() {
+export default function CatalogPage({ searchParams }: PageProps<"/catalog">) {
   return (
     <>
       <PageTitle>Catalog</PageTitle>
       <Suspense fallback={<Loading />}>
-        <Boards />
+        <Boards searchParams={searchParams} />
       </Suspense>
     </>
   );
 }
 
-async function Boards() {
+async function Boards({ searchParams }: Pick<PageProps<"/catalog">, "searchParams">) {
   const member = await requireMember();
-  const date = await today();
-  const [programmes, scholarships] = await Promise.all([
-    core.listProgrammes(member.id, date),
-    core.listScholarships(member.id, date),
-  ]);
+  const { q } = await searchParams;
+  const query = (Array.isArray(q) ? q[0] : q)?.trim() ?? "";
+  const { programmes, scholarships } = await core.searchCatalog(member.id, query, await today());
   const boards = [
     { id: "programmes", title: "Programmes", count: programmes.length },
     { id: "scholarships", title: "Scholarships", count: scholarships.length },
@@ -44,6 +43,7 @@ async function Boards() {
 
   return (
     <>
+      <CatalogSearch query={query} />
       <nav aria-label="Boards" className="mt-1 flex gap-5 sm:hidden">
         {boards.map((board) => (
           <a
@@ -58,7 +58,9 @@ async function Boards() {
       </nav>
       <div className="mt-4 flex flex-col gap-10 sm:mt-6">
         <Board {...boards[0]} addHref="/catalog/programmes/new" addLabel="Add Programme">
-          {programmes.length === 0 ? (
+          {programmes.length === 0 && query ? (
+            <NoMatches query={query} />
+          ) : programmes.length === 0 ? (
             <EmptyBoard title="No Programmes yet">
               Add a master&apos;s Programme you&apos;ve found so everyone in the circle can see it.
             </EmptyBoard>
@@ -67,7 +69,9 @@ async function Boards() {
           )}
         </Board>
         <Board {...boards[1]} addHref="/catalog/scholarships/new" addLabel="Add Scholarship">
-          {scholarships.length === 0 ? (
+          {scholarships.length === 0 && query ? (
+            <NoMatches query={query} />
+          ) : scholarships.length === 0 ? (
             <EmptyBoard title="No Scholarships yet">
               Add funding that&apos;s applied for separately from a Programme, like DAAD or
               Chevening.
@@ -78,6 +82,15 @@ async function Boards() {
         </Board>
       </div>
     </>
+  );
+}
+
+/** A board with nothing matching the search. */
+function NoMatches({ query }: { query: string }) {
+  return (
+    <EmptyBoard title="No matches">
+      Nothing here matches &ldquo;{query}&rdquo;. Try fewer words, or add it.
+    </EmptyBoard>
   );
 }
 
@@ -115,6 +128,8 @@ function Board({
   );
 }
 
+type Found = Awaited<ReturnType<typeof core.searchCatalog>>;
+
 type NextDeadline = { nextDeadline: { date: string } | null; deadlinesPassed: boolean };
 
 /** A row's lead: its next Deadline's date, or why there is none to show. */
@@ -139,7 +154,7 @@ const programmeColumns =
 function Programmes({
   programmes,
 }: {
-  programmes: Awaited<ReturnType<typeof core.listProgrammes>>;
+  programmes: Found["programmes"];
 }) {
   return (
     <>
@@ -193,7 +208,7 @@ const scholarshipColumns =
 function Scholarships({
   scholarships,
 }: {
-  scholarships: Awaited<ReturnType<typeof core.listScholarships>>;
+  scholarships: Found["scholarships"];
 }) {
   return (
     <>

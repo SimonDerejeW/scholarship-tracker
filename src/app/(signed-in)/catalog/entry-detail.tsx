@@ -3,7 +3,10 @@ import { ExternalLink, Pencil, Plus } from "lucide-react";
 import { BoardColumns, BoardRows, boardRow, PageTitle, SectionHeading } from "@/components/board";
 import { Button } from "@/components/ui/button";
 import type { CatalogEntry } from "@/core";
+import { deleteCatalogEntry } from "@/server/catalog-actions";
+import { requireMember } from "@/server/session";
 import { DateBlock } from "./date-block";
+import { DeleteEntry } from "./delete-entry";
 import { entryHref, KIND_NAMES } from "./routes";
 import { Tracking } from "./tracking";
 
@@ -11,7 +14,7 @@ type Entry = {
   name: string;
   link: string | null;
   notes: string | null;
-  addedBy: { name: string };
+  addedBy: { id: string; name: string };
   deadlines: { id: number; label: string; date: string }[];
   requirements: { id: number; label: string; note: string | null }[];
 };
@@ -117,8 +120,35 @@ export function EntryDetail({
         )}
       </Section>
 
-      <p className="mt-10 text-sm text-muted-foreground">Added by {data.addedBy.name}</p>
+      <AddedBy entry={entry} addedBy={data.addedBy} />
     </article>
+  );
+}
+
+/** Who added the entry; the Member who did is offered its delete. */
+async function AddedBy({
+  entry,
+  addedBy,
+}: {
+  entry: CatalogEntry;
+  addedBy: { id: string; name: string };
+}) {
+  const member = await requireMember();
+  if (addedBy.id !== member.id) {
+    return (
+      <p className="mt-10 text-sm text-muted-foreground">
+        Added by {addedBy.name}, the only Member who can delete it.
+      </p>
+    );
+  }
+  return (
+    <div className="mt-10 flex flex-col gap-1">
+      <p className="text-sm text-muted-foreground">Added by you</p>
+      <DeleteEntry
+        kindName={KIND_NAMES[entry.kind]}
+        action={deleteCatalogEntry.bind(null, entry)}
+      />
+    </div>
   );
 }
 

@@ -104,7 +104,7 @@ describe("Scholarship input", () => {
     await expect(core.addScholarship(ana.id, { ...daad, provider: "" })).rejects.toThrow(
       new InvalidInputError("A Scholarship needs a provider."),
     );
-    expect(await core.listScholarships(ana.id, "2027-01-01")).toEqual([]);
+    expect((await core.searchCatalog(ana.id, "", "2027-01-01")).scholarships).toEqual([]);
   });
 
   test("trims text, leaves blank optional fields empty, and only takes a web address as the link", async ({
@@ -171,7 +171,7 @@ describe("the Catalog's Scholarships", () => {
       coverage: "Tuition and living costs",
     });
 
-    expect(await core.listScholarships(bo.id, "2027-01-01")).toMatchObject([
+    expect((await core.searchCatalog(bo.id, "", "2027-01-01")).scholarships).toMatchObject([
       { name: "chevening", provider: "FCDO", coverage: "Tuition and living costs" },
       { name: "DAAD Study Scholarship", provider: "DAAD", coverage: null },
     ]);
@@ -191,7 +191,7 @@ describe("the Catalog's Scholarships", () => {
       date: "2027-11-04",
     });
 
-    expect(await core.listScholarships(ana.id, "2027-10-16")).toMatchObject([
+    expect((await core.searchCatalog(ana.id, "", "2027-10-16")).scholarships).toMatchObject([
       { name: "Chevening", nextDeadline: { label: "Final, 12:00 GMT", date: "2027-11-04" } },
       { name: "DAAD Study Scholarship", nextDeadline: null, deadlinesPassed: true },
     ]);

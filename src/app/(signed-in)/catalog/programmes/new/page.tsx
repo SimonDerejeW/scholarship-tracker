@@ -1,5 +1,5 @@
 import { BackLink, PageLede, PageTitle } from "@/components/board";
-import { addProgramme } from "@/server/catalog-actions";
+import { addProgramme, findInCatalog } from "@/server/catalog-actions";
 import { ProgrammeForm } from "../../forms";
 
 export default function NewProgrammePage() {
@@ -10,7 +10,11 @@ export default function NewProgrammePage() {
       <PageLede>
         Everyone in the circle will see it. You can add its Deadlines and Requirements next.
       </PageLede>
-      <ProgrammeForm action={addProgramme} submitLabel="Add Programme" />
+      <ProgrammeForm
+        action={addProgramme}
+        submitLabel="Add Programme"
+        findMatches={findInCatalog.bind(null, "programme")}
+      />
     </>
   );
 }
