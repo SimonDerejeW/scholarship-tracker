@@ -117,7 +117,7 @@ npm run typecheck
 npm run lint
 ```
 
-All three must pass. For UI changes, also look at the screens you touched in the browser, at phone and desktop widths.
+All three must pass. CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs them on every PR and every push to `main`. For UI changes, also look at the screens you touched in the browser, at phone and desktop widths.
 
 ## Commits and PRs
 
