@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/server/auth-actions";
+import { core } from "@/server/core";
 import { requireMember } from "@/server/session";
 import { CurrentNavLinks, NavLinks } from "./nav-links";
 
@@ -22,13 +23,18 @@ export default function SignedInLayout({ children }: LayoutProps<"/">) {
         </div>
         <nav aria-label="Main" className="mx-auto mt-1 flex max-w-board gap-6 px-4">
           <Suspense fallback={<NavLinks />}>
-            <CurrentNavLinks />
+            <MemberNavLinks />
           </Suspense>
         </nav>
       </header>
       <main className="mx-auto w-full max-w-board flex-1 px-4 pt-6 pb-16 sm:pt-8">{children}</main>
     </>
   );
+}
+
+async function MemberNavLinks() {
+  const member = await requireMember();
+  return <CurrentNavLinks isAdmin={await core.isAdmin(member.id)} />;
 }
 
 async function MemberMenu() {

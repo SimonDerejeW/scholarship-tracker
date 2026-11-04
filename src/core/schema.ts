@@ -14,6 +14,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 // Better Auth's tables. Its "user" model is mapped to `member` (see GLOSSARY.md).
+// A removed Member's row stays, so the Catalog entries they added still name them.
 
 export const member = pgTable("member", {
   id: text("id").primaryKey(),
@@ -23,6 +24,8 @@ export const member = pgTable("member", {
   image: text("image"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  /** When the Admin removed this Member; null while they are one. */
+  removedAt: timestamp("removed_at"),
 });
 
 export const session = pgTable("session", {
@@ -63,6 +66,14 @@ export const verification = pgTable("verification", {
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// Access (ADR 0004).
+
+/** An email address permitted to sign in and become a Member, stored trimmed and lower-cased. */
+export const allowlistEntry = pgTable("allowlist_entry", {
+  email: text("email").primaryKey(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 // The Catalog.

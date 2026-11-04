@@ -1,4 +1,5 @@
 import type { PgDatabase, PgQueryResultHKT } from "drizzle-orm/pg-core";
+import { accessOperations } from "./access";
 import { applicationOperations } from "./applications";
 import { checklistOperations } from "./checklists";
 import { deletionOperations } from "./deletion";
@@ -29,9 +30,8 @@ export type CoreConfig = {
 };
 
 export function createCore({ db, adminEmail }: CoreConfig) {
-  const admin = normalizeEmail(adminEmail);
-
   return {
+    ...accessOperations(db, adminEmail),
     ...programmeOperations(db),
     ...scholarshipOperations(db),
     ...entryListOperations(db),
@@ -41,16 +41,7 @@ export function createCore({ db, adminEmail }: CoreConfig) {
     ...applicationOperations(db),
     ...checklistOperations(db),
     ...upcomingOperations(db),
-
-    /** Whether this email may sign in and become a Member. */
-    async canSignIn(email: string): Promise<boolean> {
-      return normalizeEmail(email) === admin;
-    },
   };
 }
 
 export type Core = ReturnType<typeof createCore>;
-
-function normalizeEmail(email: string) {
-  return email.trim().toLowerCase();
-}

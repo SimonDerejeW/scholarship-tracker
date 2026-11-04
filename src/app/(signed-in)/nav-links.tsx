@@ -8,14 +8,17 @@ const LINKS = [
   { href: "/catalog", label: "Catalog" },
 ];
 
+/** Only the Admin sees this one. */
+const ADMIN_LINK = { href: "/admin", label: "Admin" };
+
 /** The main navigation, marking the current area. */
-export function CurrentNavLinks() {
-  return <NavLinks pathname={usePathname()} />;
+export function CurrentNavLinks({ isAdmin }: { isAdmin: boolean }) {
+  return <NavLinks pathname={usePathname()} isAdmin={isAdmin} />;
 }
 
 /** The main navigation; with no pathname, nothing is marked current. */
-export function NavLinks({ pathname }: { pathname?: string }) {
-  return LINKS.map(({ href, label }) => {
+export function NavLinks({ pathname, isAdmin = false }: { pathname?: string; isAdmin?: boolean }) {
+  return (isAdmin ? [...LINKS, ADMIN_LINK] : LINKS).map(({ href, label }) => {
     // Applications live under Upcoming.
     const current =
       href === "/"
