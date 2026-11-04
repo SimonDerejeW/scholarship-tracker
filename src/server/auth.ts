@@ -20,6 +20,7 @@ async function rejectUninvited(email: string) {
 export const auth = betterAuth({
   secret: requireEnv("BETTER_AUTH_SECRET"),
   baseURL: requireEnv("BETTER_AUTH_URL"),
+  // Better Auth keeps its own tables; who may sign in is still core's call (ADR 0005).
   database: drizzleAdapter(db, { provider: "pg", schema }),
   user: { modelName: "member" },
   socialProviders: {

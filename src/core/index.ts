@@ -19,7 +19,8 @@ export { STAGES } from "./schema";
 export { InvalidInputError, NotAllowedError, NotFoundError } from "./errors";
 
 // The core module: every rule lives here, and it is the only code that talks to
-// the database. Next.js routes and server actions are thin adapters over it.
+// the database, apart from Better Auth keeping its own tables (ADR 0005). Next.js
+// routes and server actions are thin adapters over it.
 
 export type Db = PgDatabase<PgQueryResultHKT, typeof schema>;
 
