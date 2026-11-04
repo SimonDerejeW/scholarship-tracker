@@ -58,6 +58,10 @@ Production runs on Vercel's free Hobby plan with Neon's free Postgres, added thr
 - **Google Cloud Console:** add `${BETTER_AUTH_URL}/api/auth/callback/google` for the production URL as a second redirect URI. Then publish the OAuth consent screen ("In production"): in "Testing" mode, Google blocks every account not listed as a test user. Only email and profile are requested, so no Google verification is needed. The Allowlist still decides who gets in.
 - **Preview deployments** can't sign in, because `BETTER_AUTH_URL` points at production. That's expected.
 
+## Contributing
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md): the agent workflow (mattpocock-skills and Impeccable), UI and code rules, and the checks to run before a PR.
+
 ## Scripts
 
 | Command | What it does |
